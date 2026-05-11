@@ -1,0 +1,4 @@
+/* Overrides on top of Pico.css. Step 1 stub. */
+:root {
+  --pico-font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

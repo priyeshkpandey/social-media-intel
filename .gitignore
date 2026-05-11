@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.eggs/
+*.egg-info/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# uv
+.python-version
+
+# Node / Vite
+node_modules/
+site/dist/
+site/.vite/
+*.tsbuildinfo
+
+# Pipeline runtime
+.cache/
+out/
+*.parquet
+*.sqlite
+
+# Local secrets
+.env
+.env.local
+.envrc
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
