@@ -32,16 +32,16 @@ Configured in `pipeline/config.py`; behavior implemented in Step 6.
 
 ## Scoring rubrics
 
-All six dimensions are computed heuristically in Step 7 (`pipeline/stages/score.py`). The implementation reads its inputs from `pipeline/config.py`.
+All six dimensions are computed heuristically in `pipeline/stages/score.py`. The implementation reads its inputs from `pipeline/config.py`.
 
 | Dimension | Rubric |
 |---|---|
-| **Frequency** | `frequency_per_week` (posts/week in the 12-month window) and `frequency_zscore` (z-score vs all clusters) |
-| **Perceived cost** | Aggregates `CostMention` rows extracted via `MONEY_REGEX`, `TIME_REGEX`, `TEAM_REGEX`. Reported as a human-readable summary plus medians per kind |
-| **Demography** | Top 3 roles by share, derived from `SUBREDDIT_ROLE_HINTS`, post-text role mentions, and SO/HN tags. Canonical taxonomy in `ROLES` |
-| **Monetization opportunity** | Composite (0–100): `frequency_zscore × mean_negative_sentiment × pay_intent_phrase_density`, normalized across clusters. Pay-intent phrases listed in `PAY_INTENT_PHRASES` |
-| **Feasibility** | `FEASIBILITY_LOW_KEYWORDS` push toward `low`, `FEASIBILITY_HIGH_KEYWORDS` toward `high`, otherwise `medium` |
-| **Implementation cost band** | Function of feasibility × scope keywords (`IMPL_COST_SCOPE_KEYWORDS`): `<$10k` / `$10-100k` / `$100k-1M` / `>$1M` |
+| **Frequency** | `frequency_per_week = posts_in_cluster / (last_seen − first_seen, in weeks; minimum 1 day)`. `frequency_zscore` is the standard z-score against the batch (`std` clamped to 1e-6). The 12-month rolling view is reconstructed at export by stitching prior dashboard.json releases (Step 9). |
+| **Perceived cost** | `CostSummary` with medians per kind: `money_median_usd`, `time_median_days` (hours/weeks/months/years normalized to days), `team_median_people`. Plus a human-readable `summary` string. |
+| **Demography** | Top 3 (`role`, `share`) tuples by post count. Roles come from `infer_role` (text mentions override the source's default hint). Posts without a role are counted as `other`. |
+| **Monetization opportunity** | Composite 0–100: `40·sigmoid(freq_z) + 30·mean_neg_sentiment + 30·pay_intent_density`. Pay-intent uses `PAY_INTENT_PHRASES`. Negative-sentiment magnitude only counts posts with VADER compound < 0. |
+| **Feasibility** | Count keyword hits in `FEASIBILITY_LOW_KEYWORDS` vs `FEASIBILITY_HIGH_KEYWORDS`. More low → `low`; more high → `high`; tied → `medium`. |
+| **Implementation cost band** | Scope inferred from `IMPL_COST_SCOPE_KEYWORDS` with **largest-wins priority** (`huge > large > medium > small`). The (feasibility, scope) pair indexes a 4×3 lookup: e.g. `(high, small) → <$10k`, `(medium, medium) → $10-100k`, `(low, large) → >$1M`. |
 
 ## Claude synthesis
 

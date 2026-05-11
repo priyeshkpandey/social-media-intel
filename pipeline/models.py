@@ -92,6 +92,22 @@ class ClusterSynthesis:
 
 
 @dataclass(slots=True)
+class CostSummary:
+    """Aggregated cost evidence for a cluster.
+
+    Medians are over `CostMention`s of the matching kind across the cluster's
+    posts. Time mentions are normalized to days at extraction time. `summary`
+    is the human-readable rendering for the dashboard tooltip.
+    """
+
+    money_median_usd: float | None = None
+    time_median_days: float | None = None
+    team_median_people: float | None = None
+    sample_count: int = 0
+    summary: str = "no cost data"
+
+
+@dataclass(slots=True)
 class ScoredCluster:
     """A Cluster plus the six dashboard dimensions.
 
@@ -101,7 +117,7 @@ class ScoredCluster:
     cluster: Cluster
     frequency_per_week: float
     frequency_zscore: float
-    cost_summary: str
+    cost: CostSummary
     role_top: list[tuple[str, float]]
     opportunity: float
     feasibility: Feasibility

@@ -11,6 +11,7 @@ from pipeline.models import (
     Cluster,
     ClusterSynthesis,
     CostMention,
+    CostSummary,
     NormalizedPost,
     RawPost,
     ScoredCluster,
@@ -80,7 +81,13 @@ def test_cluster_and_scored_cluster() -> None:
         cluster=cluster,
         frequency_per_week=4.2,
         frequency_zscore=1.1,
-        cost_summary="median 2 days of engineering time per occurrence",
+        cost=CostSummary(
+            money_median_usd=None,
+            time_median_days=2.0,
+            team_median_people=None,
+            sample_count=3,
+            summary="~2 day(s)",
+        ),
         role_top=[("engineer", 0.8), ("devops", 0.2)],
         opportunity=72.5,
         feasibility="high",
@@ -114,7 +121,7 @@ def test_scored_cluster_with_synthesis_round_trips() -> None:
         cluster=cluster,
         frequency_per_week=8.0,
         frequency_zscore=2.4,
-        cost_summary="...",
+        cost=CostSummary(summary="...", sample_count=0),
         role_top=[("sre", 0.6), ("devops", 0.3)],
         opportunity=88.0,
         feasibility="medium",
@@ -124,3 +131,4 @@ def test_scored_cluster_with_synthesis_round_trips() -> None:
     blob = asdict(scored)
     assert blob["synthesis"]["title"] == "On-call burnout"
     assert blob["cluster"]["label"] == "oncall-burnout"
+    assert blob["cost"]["summary"] == "..."
