@@ -51,7 +51,7 @@ select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
 ignore = ["E501"]
 
 [tool.pytest.ini_options]
-testpaths = ["pipeline"]
+testpaths = ["tests", "pipeline/eval"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "-ra --strict-markers"
 

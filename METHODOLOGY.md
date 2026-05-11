@@ -16,31 +16,32 @@ See [`pipeline/sources/SOURCES.md`](./pipeline/sources/SOURCES.md) for the activ
 
 ## Filtering
 
-_To be documented in Step 5._
+Configured in `pipeline/config.py`; behavior implemented in Step 5.
 
-- **Cheap pass:** keyword allow/block lists.
-- **Semantic pass:** cosine similarity to ~20 curated anchor pain-point sentences (DECIDE-D), threshold `0.45`.
+- **Cheap pass:** keyword allow list (`KEYWORD_ALLOW`, 28 terms) and block list (`KEYWORD_BLOCK`, 10 patterns covering recruiting, crypto spam, courses).
+- **Semantic pass:** cosine similarity to `ANCHOR_PAIN_SENTENCES` (20 curated examples spanning engineering / devops / QA / PM / founder / customer pain). A post is kept if its max similarity to any anchor exceeds `SEMANTIC_FILTER_THRESHOLD = 0.45`. The anchor list is the single highest-leverage knob in the system and must be reviewed by the operator before each major change (DECIDE-D).
 
 ## Embedding & clustering
 
-_To be documented in Step 6._
+Configured in `pipeline/config.py`; behavior implemented in Step 6.
 
-- Embedding model: `sentence-transformers/all-MiniLM-L6-v2`.
-- Clustering: HDBSCAN on UMAP-reduced (50-dim) vectors, `min_cluster_size=5, min_samples=2`.
-- Stability across runs: posts are re-assigned to existing cluster centroids when cosine similarity > `0.6`.
+- **Embedding model:** `sentence-transformers/all-MiniLM-L6-v2` (384-dim, CPU-friendly).
+- **Dimensionality reduction:** UMAP to 50 dim with `n_neighbors=15, min_dist=0.0` before clustering.
+- **Clustering:** HDBSCAN with `min_cluster_size=5, min_samples=2`, cosine metric.
+- **Cross-run stability:** new posts are re-assigned to an existing cluster centroid when cosine similarity > `CENTROID_REASSIGN_THRESHOLD = 0.60`; otherwise HDBSCAN may create a new cluster. Centroids persist in `./.cache/cluster_state.parquet`.
 
 ## Scoring rubrics
 
-_To be documented in Step 7 — final values come from `pipeline/config.py`._
+All six dimensions are computed heuristically in Step 7 (`pipeline/stages/score.py`). The implementation reads its inputs from `pipeline/config.py`.
 
-| Dimension | Rubric (placeholder until step 7) |
+| Dimension | Rubric |
 |---|---|
-| Frequency | Posts/week, plus z-score vs all clusters in the 12-month window |
-| Perceived cost | Regex-extracted `$N` / `N hours-weeks` / `team of N` mentions, aggregated as medians |
-| Demography | Role tally per post (subreddit + text mentions + SO/HN tags) |
-| Monetization opportunity | Composite: frequency × negativity × pay-intent phrase presence |
-| Feasibility | Keyword bucket → low / medium / high |
-| Implementation cost | Coarse band: <$10k / $10–100k / $100k–1M / >$1M |
+| **Frequency** | `frequency_per_week` (posts/week in the 12-month window) and `frequency_zscore` (z-score vs all clusters) |
+| **Perceived cost** | Aggregates `CostMention` rows extracted via `MONEY_REGEX`, `TIME_REGEX`, `TEAM_REGEX`. Reported as a human-readable summary plus medians per kind |
+| **Demography** | Top 3 roles by share, derived from `SUBREDDIT_ROLE_HINTS`, post-text role mentions, and SO/HN tags. Canonical taxonomy in `ROLES` |
+| **Monetization opportunity** | Composite (0–100): `frequency_zscore × mean_negative_sentiment × pay_intent_phrase_density`, normalized across clusters. Pay-intent phrases listed in `PAY_INTENT_PHRASES` |
+| **Feasibility** | `FEASIBILITY_LOW_KEYWORDS` push toward `low`, `FEASIBILITY_HIGH_KEYWORDS` toward `high`, otherwise `medium` |
+| **Implementation cost band** | Function of feasibility × scope keywords (`IMPL_COST_SCOPE_KEYWORDS`): `<$10k` / `$10-100k` / `$100k-1M` / `>$1M` |
 
 ## Claude synthesis
 
