@@ -120,6 +120,7 @@ KEYWORD_ALLOW: Final[tuple[str, ...]] = (
     "saas",
     "codebase",
     "ci/cd",
+    "pipeline",
     "oncall",
     "on-call",
     "kubernetes",
@@ -134,7 +135,9 @@ KEYWORD_ALLOW: Final[tuple[str, ...]] = (
     "burnout",
     "scope creep",
     "estimate",
+    "estimating",
     "roadmap",
+    "infrastructure",
 )
 
 KEYWORD_BLOCK: Final[tuple[str, ...]] = (

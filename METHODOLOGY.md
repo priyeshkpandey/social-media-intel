@@ -18,7 +18,7 @@ See [`pipeline/sources/SOURCES.md`](./pipeline/sources/SOURCES.md) for the activ
 
 Configured in `pipeline/config.py`; behavior implemented in Step 5.
 
-- **Cheap pass:** keyword allow list (`KEYWORD_ALLOW`, 28 terms) and block list (`KEYWORD_BLOCK`, 10 patterns covering recruiting, crypto spam, courses).
+- **Cheap pass:** keyword allow list (`KEYWORD_ALLOW`) and block list (`KEYWORD_BLOCK`, covering recruiting, crypto spam, courses, generic motivational posts). Each keyword is compiled with a trailing `\w{0,4}` inflection allowance, so `engineer` matches `engineers`/`engineering`/`engineered` automatically; stem-changing forms like `estimating` are added to `KEYWORD_ALLOW` explicitly. A post is kept iff it matches an allow term and no block term.
 - **Semantic pass:** cosine similarity to `ANCHOR_PAIN_SENTENCES` (20 curated examples spanning engineering / devops / QA / PM / founder / customer pain). A post is kept if its max similarity to any anchor exceeds `SEMANTIC_FILTER_THRESHOLD = 0.45`. The anchor list is the single highest-leverage knob in the system and must be reviewed by the operator before each major change (DECIDE-D).
 
 ## Embedding & clustering

@@ -1,0 +1,82 @@
+[
+  {
+    "label": "keep",
+    "note": "ci pain",
+    "text": "Our CI pipeline takes 2 hours per pull request and the team is losing patience."
+  },
+  {
+    "label": "keep",
+    "note": "pm frustration",
+    "text": "I'm a product manager and our roadmap keeps getting overridden by sales escalations."
+  },
+  {
+    "label": "keep",
+    "note": "flaky tests",
+    "text": "Flaky tests in our microservices repo are killing developer velocity."
+  },
+  {
+    "label": "keep",
+    "note": "sre burnout",
+    "text": "Burnout from on-call rotations is real in our SRE team."
+  },
+  {
+    "label": "keep",
+    "note": "cloud cost",
+    "text": "Our cloud bill jumped 3x this quarter and the engineering team can't explain why."
+  },
+  {
+    "label": "keep",
+    "note": "legacy",
+    "text": "Refactoring legacy code without breaking production feels impossible right now."
+  },
+  {
+    "label": "keep",
+    "note": "estimate friction",
+    "text": "Estimating delivery dates is a constant source of friction with stakeholders."
+  },
+  {
+    "label": "keep",
+    "note": "k8s tax",
+    "text": "Kubernetes complexity is a tax we pay every single day, devops included."
+  },
+  {
+    "label": "keep",
+    "note": "qa velocity",
+    "text": "Our QA team can't keep up with feature velocity and tech debt keeps growing."
+  },
+  {
+    "label": "keep",
+    "note": "pay intent",
+    "text": "I would pay good money for a tool that automatically writes integration tests for our codebase."
+  },
+  {
+    "label": "drop",
+    "category": "spam",
+    "note": "hiring",
+    "text": "We're hiring senior engineers — DM me to join our team!"
+  },
+  {
+    "label": "drop",
+    "category": "spam",
+    "note": "crypto",
+    "text": "Crypto pump alert! NFT airdrop next week, get in early."
+  },
+  {
+    "label": "drop",
+    "category": "spam",
+    "note": "course",
+    "text": "Free course on devops basics — no fluff, just essentials."
+  },
+  {
+    "label": "drop",
+    "category": "needs_semantic",
+    "note": "saas promo",
+    "text": "Our new SaaS makes task management painless — try the free tier today!"
+  },
+  {
+    "label": "drop",
+    "category": "noise",
+    "note": "generic",
+    "text": "Have a great Monday everyone, hope your week goes well!"
+  }
+]
