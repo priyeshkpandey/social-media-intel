@@ -122,13 +122,19 @@ LOBSTERS_RSS: Final[str] = "https://lobste.rs/rss"
 
 # Lemmy is a federated Reddit-clone with a public REST API per instance.
 # Each entry is (instance, community, role_hint). No auth required; data-center
-# IPs are fine. Picked for active dev-focused communities as of 2026-05.
+# IPs are fine. Curated 2026-05-12 after empirically dropping zero-yield ones:
+#   * removed programming.dev/c/devops (dead community)
+#   * removed lemmy.world/c/programming (dead — the community isn't federated
+#     into lemmy.world's frontend; the real /c/programming lives on
+#     programming.dev and lemmy.ml)
+#   * moved asklemmy from programming.dev (404) to lemmy.world where it
+#     actually exists
+#   * added sh.itjust.works/c/programming as a third active instance
 LEMMY_COMMUNITIES: Final[tuple[tuple[str, str, str], ...]] = (
     ("programming.dev", "programming", "engineer"),
-    ("programming.dev", "devops", "devops"),
-    ("programming.dev", "asklemmy", "engineer"),
     ("lemmy.ml", "programming", "engineer"),
-    ("lemmy.world", "programming", "engineer"),
+    ("lemmy.world", "asklemmy", "engineer"),
+    ("sh.itjust.works", "programming", "engineer"),
 )
 
 # ---------------------------------------------------------------------------
@@ -184,12 +190,18 @@ KEYWORD_BLOCK: Final[tuple[str, ...]] = (
     "free course",
 )
 
-SEMANTIC_FILTER_THRESHOLD: Final[float] = 0.45
+SEMANTIC_FILTER_THRESHOLD: Final[float] = 0.40
 
 # DECIDE-D: anchor pain-point sentences for the semantic filter pass.
 # The semantic filter keeps posts whose max cosine similarity to any of
 # these anchors exceeds SEMANTIC_FILTER_THRESHOLD. These are the highest-
 # leverage configuration in the system — review and edit before first run.
+#
+# 2026-05-12: bumped 20 → 28 anchors. The original 20 produced ~93% drop on
+# the first real Reddit-alternative run; eight new anchors cover themes that
+# surfaced as live clusters (AI-coding quality, microservices observability,
+# deploy reliability) plus adjacent likely-to-appear ones (config sprawl,
+# retention, observability cost, DB migration anxiety, AI verification cost).
 ANCHOR_PAIN_SENTENCES: Final[tuple[str, ...]] = (
     "On-call rotations are burning out our engineers.",
     "Our CI pipeline takes hours and blocks every pull request.",
@@ -211,6 +223,15 @@ ANCHOR_PAIN_SENTENCES: Final[tuple[str, ...]] = (
     "Kubernetes complexity is a tax we pay every single day.",
     "AI coding assistants help but their hallucinations cost us debugging time.",
     "Our QA team cannot keep up with the feature velocity.",
+    # Added 2026-05-12 — themes that surfaced as live clusters or were under-represented.
+    "Our AI coding assistant generates plausible-looking code that ships bugs we don't catch.",
+    "We can't trace a single request through 30 microservices without spending half a day.",
+    "Friday deploys are roulette; we've stopped doing them and now work piles up over weekends.",
+    "Every new tool we adopt brings config files our team can't fully reason about.",
+    "Senior engineers leave faster than we can backfill the institutional knowledge.",
+    "Our observability bill exceeds compute spend and still misses real incidents.",
+    "Database schema migrations on hot production tables terrify the team.",
+    "AI-generated pull requests need so much verification we save almost no engineering time.",
 )
 
 # ---------------------------------------------------------------------------

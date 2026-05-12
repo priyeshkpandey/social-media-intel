@@ -75,9 +75,27 @@ class SemanticFilter:
         self._anchor_emb = _l2_normalize(embed_fn(list(anchors)))
 
     def keep_many(self, texts: list[str]) -> list[bool]:
+        """Embed `texts` from scratch and return keep/drop decisions.
+
+        Convenience method for callers without precomputed embeddings.
+        When the orchestrator already has embeddings (typical pipeline run),
+        prefer `keep_mask` to avoid the redundant embedding pass.
+        """
         if not texts:
             return []
-        vecs = _l2_normalize(self._embed_fn(texts))
+        vecs = self._embed_fn(texts)
+        return self.keep_mask(vecs)
+
+    def keep_mask(self, embeddings: np.ndarray) -> list[bool]:
+        """Decide keep/drop given already-computed embeddings.
+
+        Use this from the orchestrator when you've already embedded the
+        candidates for downstream clustering — re-embedding inside the
+        filter wastes ~30s per 1500 posts on the GHA runner.
+        """
+        if len(embeddings) == 0:
+            return []
+        vecs = _l2_normalize(embeddings)
         # Both sides L2-normalized → dot product == cosine similarity.
         sims = vecs @ self._anchor_emb.T
         max_sims = sims.max(axis=1)

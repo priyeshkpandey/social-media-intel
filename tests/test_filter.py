@@ -96,6 +96,33 @@ def test_semantic_filter_rejects_empty_anchors() -> None:
         flt.SemanticFilter(embed_fn=_FakeEmbedder(), anchors=(), threshold=0.5)
 
 
+def test_keep_mask_uses_precomputed_embeddings() -> None:
+    """keep_mask must not call embed_fn — it's for the precomputed path."""
+    calls: list[list[str]] = []
+
+    def embed_fn(texts: list[str]) -> np.ndarray:
+        calls.append(texts)
+        out = np.zeros((len(texts), 2), dtype=np.float32)
+        for i, t in enumerate(texts):
+            out[i, 0 if "pain" in t else 1] = 1.0
+        return out
+
+    sf = flt.SemanticFilter(embed_fn=embed_fn, anchors=("pain",), threshold=0.5)
+    assert len(calls) == 1  # one call for the anchors
+
+    # Pre-built embeddings: row 0 maps to "pain" axis, row 1 to "noise" axis.
+    embeddings = np.array([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
+    decisions = sf.keep_mask(embeddings)
+    assert decisions == [True, False]
+    # embed_fn was NOT called again for the candidates.
+    assert len(calls) == 1
+
+
+def test_keep_mask_empty_input() -> None:
+    sf = flt.SemanticFilter(embed_fn=_FakeEmbedder(), anchors=("pain",), threshold=0.5)
+    assert sf.keep_mask(np.zeros((0, 2), dtype=np.float32)) == []
+
+
 # ---------- filter_posts orchestration ----------
 
 

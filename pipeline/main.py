@@ -100,15 +100,15 @@ def main(argv: list[str] | None = None) -> int:
     cheap_kept = [p for p in deduped if filter_stage.cheap_pass(p.text)]
     log.info("filter.cheap: %d posts kept", len(cheap_kept))
 
-    # 5. Embed (single pass; embeddings reused for semantic filter + cluster).
+    # 5. Embed once; reuse the matrix for the semantic filter and clustering.
     import numpy as np  # lazy import — Step 12 main is the only call site
 
     embedder = embed_stage.Embedder()
     if cheap_kept:
         cheap_embeddings = embedder([p.text for p in cheap_kept])
-        # 6. Semantic filter.
+        # 6. Semantic filter — reuse the embeddings instead of re-computing.
         semantic = filter_stage.SemanticFilter(embed_fn=embedder)
-        keep_mask = semantic.keep_many([p.text for p in cheap_kept])
+        keep_mask = semantic.keep_mask(cheap_embeddings)
         kept_posts = [p for p, k in zip(cheap_kept, keep_mask, strict=True) if k]
         keep_indices = [i for i, k in enumerate(keep_mask) if k]
         kept_embeddings = (
