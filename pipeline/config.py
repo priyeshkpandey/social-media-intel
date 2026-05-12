@@ -271,8 +271,17 @@ IMPL_COST_SCOPE_KEYWORDS: Final[dict[str, tuple[str, ...]]] = {
 
 TOP_N_FOR_SYNTHESIS: Final[int] = 25
 SYNTHESIS_BUDGET_USD: Final[float] = 1.00
-HAIKU_MODEL: Final[str] = "claude-haiku-4-5-20251001"
+# Use Anthropic model aliases (no date suffix). Pricing per shared/models.md.
+HAIKU_MODEL: Final[str] = "claude-haiku-4-5"
 SONNET_MODEL: Final[str] = "claude-sonnet-4-6"
+
+# Per-1M-token pricing in USD (Haiku 4.5 / Sonnet 4.6).
+HAIKU_INPUT_PRICE_PER_M: Final[float] = 1.0
+HAIKU_OUTPUT_PRICE_PER_M: Final[float] = 5.0
+HAIKU_CACHE_WRITE_PRICE_PER_M: Final[float] = 1.25
+HAIKU_CACHE_READ_PRICE_PER_M: Final[float] = 0.1
+SONNET_INPUT_PRICE_PER_M: Final[float] = 3.0
+SONNET_OUTPUT_PRICE_PER_M: Final[float] = 15.0
 
 # ---------------------------------------------------------------------------
 # Source rate-limiting & retries

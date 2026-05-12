@@ -45,12 +45,12 @@ All six dimensions are computed heuristically in `pipeline/stages/score.py`. The
 
 ## Claude synthesis
 
-_To be documented in Step 8._
+Implemented in `pipeline/stages/synthesize.py`. Env-gated by `ANTHROPIC_API_KEY` — when unset, the stage is a no-op and the dashboard renders heuristic-only output with a banner.
 
-- Per-cluster (top 25): Haiku 4.5 with prompt-cached system prompt.
-- Weekly synthesis: Sonnet 4.6, one call against all 25 Haiku outputs.
-- Hard budget: $1.00/run; abort otherwise.
-- Heuristic-only fallback when `ANTHROPIC_API_KEY` is unset.
+- **Per-cluster (Haiku 4.5):** for the top `TOP_N_FOR_SYNTHESIS = 25` clusters by heuristic `opportunity`, one API call each. System prompt is reused with `cache_control={"type": "ephemeral"}` (cache only activates above Haiku 4.5's 4096-token prefix minimum; harmless when under). Response is structured JSON via `output_config.format` (no markdown-fence parsing). Haiku 4.5 doesn't support `effort` and is called without it. Output is a `ClusterSynthesis` attached to the `ScoredCluster`.
+- **Weekly narrative (Sonnet 4.6):** one call against all refined cluster syntheses produces the dashboard hero JSON (`headline`, `top_10`, `honorable_mentions`). Uses adaptive thinking (`thinking={"type": "adaptive"}`) + `effort: "high"`.
+- **Budget cap:** `SYNTHESIS_BUDGET_USD = 1.00` per run. After each API call, cost is accumulated from `usage.input_tokens`, `output_tokens`, `cache_creation_input_tokens`, and `cache_read_input_tokens` against per-1M-token prices in `config.py`. Once `spent ≥ budget`, remaining Haiku calls are skipped and the Sonnet call is suppressed.
+- **Failure handling:** any per-call exception or malformed JSON drops that cluster back to heuristic-only output (its `synthesis` field stays `None`). The narrative call is suppressed when every cluster fell back.
 
 ## Limitations
 
