@@ -1,0 +1,132 @@
+name: Weekly refresh
+
+on:
+  workflow_dispatch:
+  # NOTE: cron is intentionally disabled until Step 14. Uncomment after a
+  # successful manual run to enable the weekly cadence (Mondays 06:00 UTC).
+  # schedule:
+  #   - cron: "0 6 * * MON"
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          python-version: "3.11"
+          enable-cache: true
+
+      - name: Install Python deps
+        run: uv sync
+
+      - name: Prepare output dirs
+        run: mkdir -p out .cache
+
+      - name: Restore cluster-state cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache
+          key: cluster-state-${{ github.run_id }}
+          restore-keys: |
+            cluster-state-
+
+      - name: Run pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -o pipefail
+          uv run python -m pipeline.main --since 7d --out ./out --cache ./.cache \
+            2>&1 | tee out/run_log.txt
+
+      - name: Determine release tag
+        id: tag
+        run: |
+          TAG=$(python3 -c "import json; print(json.load(open('out/dashboard.json'))['run_id'])")
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $TAG"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "Refresh ${{ steps.tag.outputs.tag }}"
+          body: |
+            Automated weekly refresh — see [METHODOLOGY.md](../blob/main/METHODOLOGY.md) for rubrics.
+
+            Run: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          files: |
+            out/dashboard.json
+            out/clusters.parquet
+            out/raw.parquet
+            out/run_log.txt
+
+      - name: Save cluster-state cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .cache
+          key: cluster-state-${{ github.run_id }}
+
+      - name: Prune old releases (keep most recent 60)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release list --limit 200 --json tagName,createdAt \
+            --jq 'sort_by(.createdAt) | reverse | .[60:] | .[].tagName' \
+            | while read -r tag; do
+                if [ -n "$tag" ]; then
+                  echo "Pruning old release: $tag"
+                  gh release delete "$tag" --yes --cleanup-tag || true
+                fi
+              done
+
+      - name: Trigger Pages deploy
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let logTail = '(no log captured)';
+            try {
+              const log = fs.readFileSync('out/run_log.txt', 'utf-8');
+              logTail = log.split('\n').slice(-80).join('\n');
+            } catch (e) { /* missing log */ }
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Weekly refresh failed — run ${context.runId}`,
+              body: [
+                'The weekly refresh workflow failed.',
+                '',
+                `Run: ${runUrl}`,
+                '',
+                'Log tail:',
+                '```',
+                logTail,
+                '```',
+              ].join('\n'),
+              labels: ['workflow-failure'],
+            });
