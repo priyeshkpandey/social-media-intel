@@ -17,7 +17,7 @@ env/
 htmlcov/
 
 # uv
-.python-version
+# .python-version is committed; it pins Python for CI + local dev.
 
 # Node / Vite
 node_modules/
