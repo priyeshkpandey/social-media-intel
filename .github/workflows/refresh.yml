@@ -2,10 +2,9 @@ name: Weekly refresh
 
 on:
   workflow_dispatch:
-  # NOTE: cron is intentionally disabled until Step 14. Uncomment after a
-  # successful manual run to enable the weekly cadence (Mondays 06:00 UTC).
-  # schedule:
-  #   - cron: "0 6 * * MON"
+  # Sun 22:00 UTC = 03:30 IST Monday — briefing ready before the operator's workday.
+  schedule:
+    - cron: "0 22 * * SUN"
 
 concurrency:
   group: refresh

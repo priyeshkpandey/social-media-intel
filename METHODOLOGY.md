@@ -64,9 +64,29 @@ The 12-month rolling time series is reconstructed at render time by fetching pri
 
 ## Limitations
 
-_To be filled in after Step 13._
+These are v1 trade-offs surfaced during the first weeks of live operation. Each is a candidate for a follow-up improvement when the cost/value math justifies it.
 
-- Proxy sources are not a 1:1 substitute for X/LinkedIn coverage.
-- Free-tier API rate limits constrain weekly volume.
-- Cluster stability across weeks is centroid-based and can drift; see Step 6 notes when written.
-- `frequency_per_week` and `frequency_zscore` are batch-local; long-window trends require stitching prior dashboard.json releases at render time.
+### Source coverage
+
+- **X (Twitter) and LinkedIn are deliberately excluded.** Pain points unique to those communities are invisible to this pipeline. The five proxy sources (Reddit, Hacker News, dev.to, Lobsters, Stack Overflow) cover ~80% of public developer-frustration discussion in our experience, but enterprise / non-engineer-PM voice is under-represented.
+- **Reddit requires app-only OAuth on GitHub Actions.** `old.reddit.com` returns 403 to data-center IPs (every GHA runner), so without the `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` secrets the dataset becomes HN + dev.to + Lobsters + Stack Exchange only. In that mode, dev.to dominates the raw ingest (≈3,000/week of mostly listicles + Show-HN-style posts), which the semantic filter then trims aggressively. See README → Setup for the secrets flow.
+- **HN is over-represented by query.** "Show HN" matches a lot of product launches that are not pain points. We rely on the semantic filter to drop these; if the filter loosens, HN noise will leak through.
+
+### Filter aggressiveness
+
+- **The semantic filter dropped ~93% of cheap-pass posts** on the first live run (712 → 53). That's the correct behavior for that input mix (heavy on Show-HN/listicles), but it means cluster density is highly sensitive to the anchor-sentence set in `config.py:ANCHOR_PAIN_SENTENCES` and the `SEMANTIC_FILTER_THRESHOLD = 0.45` cutoff. If you change either, expect cluster counts to swing by 5–10×.
+- The anchor list is hand-curated and English-only.
+
+### Time-series fidelity
+
+- **`frequency_per_week` and `frequency_zscore` are batch-local** — they describe this week's cluster activity relative to other clusters in this same run, not the historical norm. A cluster's "z-score" is meaningful within a run but not comparable across runs.
+- **The dashboard's "activity timeline" plots only the current week's representative posts**, not the 12-month rolling window BUILD_PROMPT.md envisions. Multi-release stitching (fetch the prior N releases' dashboard.json files and concatenate) isn't wired up in v1. Until it lands, the timeline is a single-week density chart.
+
+### LLM cost & failure
+
+- **The `$1.00/run` budget cap is per-run, not per-month.** Worst case at the weekly cadence: 52 × $1 = $52/year. Realistic recent runs cost ~$0.03–0.10. There's no cumulative monthly ceiling — if Anthropic pricing changes or the cluster count spikes (more Haiku calls), the cap won't catch it.
+- **Sonnet narrative is best-effort.** When the call fails or returns no text block (e.g., adaptive thinking eats the `max_tokens` budget), the dashboard falls back to the heuristic ranking with no banner — the user sees fewer ranked cards but no error. Diagnostic logging now surfaces the `stop_reason` so failures are debuggable.
+
+### Cluster stability
+
+- **Centroid-based reassignment can drift** when a cluster's underlying topic shifts. If new posts pull the centroid more than `CENTROID_REASSIGN_THRESHOLD = 0.60` away from a prior centroid, a new cluster is spawned and the old one becomes inactive — which can fragment what is intuitively the same pain point over multiple weeks. There's no manual merge UI in v1.

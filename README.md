@@ -8,7 +8,7 @@ A weekly-refreshed dashboard of software-industry pain points, mined from public
 
 ## Status
 
-Pipeline + dashboard scaffolding are complete; the first real run is gated behind manual workflow dispatch (see Setup below).
+v1 live. Weekly refresh runs Sunday 22:00 UTC and publishes a GitHub Release per ISO week (`vYYYY-WW`). The dashboard at the URL above reads the latest release's `dashboard.json` (bundled into the Pages deploy at deploy time).
 
 ## Setup (one-time, by the repository owner)
 
