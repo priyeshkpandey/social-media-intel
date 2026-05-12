@@ -27,7 +27,7 @@ Configured in `pipeline/config.py`; behavior implemented in Step 6.
 
 - **Embedding model:** `sentence-transformers/all-MiniLM-L6-v2` (384-dim, CPU-friendly).
 - **Dimensionality reduction:** UMAP to 50 dim with `n_neighbors=15, min_dist=0.0` before clustering.
-- **Clustering:** HDBSCAN with `min_cluster_size=5, min_samples=2`, cosine metric.
+- **Clustering:** HDBSCAN with `min_cluster_size=5, min_samples=2`, `cluster_selection_method="leaf"` (chosen 2026-05-12 — the default `"eom"` was merging dominant topics into one mega-cluster on weeks with a strong theme; `"leaf"` returns the leaves of the cluster tree for finer-grained sub-themes).
 - **Cross-run stability:** new posts are re-assigned to an existing cluster centroid when cosine similarity > `CENTROID_REASSIGN_THRESHOLD = 0.60`; otherwise HDBSCAN may create a new cluster. Centroids persist in `./.cache/cluster_state.parquet`.
 
 ## Scoring rubrics

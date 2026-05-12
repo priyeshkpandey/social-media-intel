@@ -134,7 +134,8 @@ LEMMY_COMMUNITIES: Final[tuple[tuple[str, str, str], ...]] = (
     ("programming.dev", "programming", "engineer"),
     ("lemmy.ml", "programming", "engineer"),
     ("lemmy.world", "asklemmy", "engineer"),
-    ("sh.itjust.works", "programming", "engineer"),
+    # Removed: sh.itjust.works/c/programming — 0 posts on 2026-05-12, community
+    # appears not to exist on that instance.
 )
 
 # ---------------------------------------------------------------------------
@@ -275,6 +276,12 @@ UMAP_MIN_DIST: Final[float] = 0.0
 
 HDBSCAN_MIN_CLUSTER_SIZE: Final[int] = 5
 HDBSCAN_MIN_SAMPLES: Final[int] = 2
+# "leaf" returns the leaves of the cluster tree → finer-grained clusters.
+# Default "eom" (excess of mass) tends to merge sub-themes into mega-clusters
+# when one topic dominates the batch (observed 2026-05-12: a single AI-coding
+# cluster absorbed 359 of 388 posts). Switching to "leaf" splits dominant
+# topics into their natural sub-themes.
+HDBSCAN_CLUSTER_SELECTION_METHOD: Final[str] = "leaf"
 
 # Cosine similarity threshold for assigning a new post to an existing
 # cluster's centroid (preserves cluster IDs across runs).

@@ -26,6 +26,7 @@ import numpy as np
 from pipeline.config import (
     CACHE_DIR,
     CENTROID_REASSIGN_THRESHOLD,
+    HDBSCAN_CLUSTER_SELECTION_METHOD,
     HDBSCAN_MIN_CLUSTER_SIZE,
     HDBSCAN_MIN_SAMPLES,
     UMAP_MIN_DIST,
@@ -186,6 +187,7 @@ def _hdbscan(reduced: np.ndarray) -> np.ndarray:
     clusterer = hdbscan.HDBSCAN(
         min_cluster_size=HDBSCAN_MIN_CLUSTER_SIZE,
         min_samples=HDBSCAN_MIN_SAMPLES,
+        cluster_selection_method=HDBSCAN_CLUSTER_SELECTION_METHOD,
         metric="euclidean",
     )
     return clusterer.fit_predict(reduced)
