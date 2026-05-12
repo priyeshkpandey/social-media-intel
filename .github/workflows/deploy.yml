@@ -44,6 +44,22 @@ jobs:
         working-directory: site
         run: npm run build
 
+      - name: Bundle latest dashboard.json into the Pages artifact
+        # GitHub release assets don't send CORS headers, so the site can't
+        # fetch them cross-origin from Pages. We download dashboard.json
+        # from the latest release at deploy time and serve it same-origin.
+        # The /releases/latest/download/<name> convenience URL redirects
+        # to whichever asset is on the latest non-prerelease release.
+        run: |
+          set -euo pipefail
+          if curl -sSL --fail \
+              "https://github.com/${{ github.repository }}/releases/latest/download/dashboard.json" \
+              -o site/dist/dashboard.json; then
+            echo "Bundled dashboard.json ($(wc -c < site/dist/dashboard.json) bytes)"
+          else
+            echo "::warning::No release yet — site will show 'No data available' until refresh runs"
+          fi
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -1,12 +1,14 @@
 // Dashboard data loading.
 //
 // Dev mode  → fetch `/sample-dashboard.json` (served from `public/`).
-// Prod mode → fetch the latest GitHub Release's `dashboard.json` asset and
-//             cache it in `localStorage` keyed by the release `tag_name`.
+// Prod mode → fetch `./dashboard.json`, a same-origin asset bundled into the
+//             Pages deploy artifact by `.github/workflows/deploy.yml`. The
+//             workflow downloads the latest GitHub Release's dashboard.json
+//             at deploy time and copies it into `site/dist/`, so the browser
+//             never has to make a CORS request to release-asset URLs (which
+//             don't send `Access-Control-Allow-Origin`).
 
-const REPO = "priyeshkpandey/social-media-intel";
 const STALE_AFTER_DAYS = 10;
-const CACHE_KEY = "smi:dashboard:v1";
 
 // ---------- types (mirror pipeline/stages/export.py) ----------
 
@@ -106,45 +108,16 @@ export interface LoadResult {
 // ---------- loader ----------
 
 export async function loadDashboard(): Promise<LoadResult> {
-  if (import.meta.env.DEV) {
-    const data = await fetchJson<Dashboard>("/sample-dashboard.json");
-    return { data, stale: false, published_at: null, source: "local" };
-  }
-  return loadFromLatestRelease();
+  const url = import.meta.env.DEV ? "/sample-dashboard.json" : "./dashboard.json";
+  const data = await fetchJson<Dashboard>(url);
+  const stale = isStale(data.generated_at, STALE_AFTER_DAYS);
+  return {
+    data,
+    stale,
+    published_at: data.generated_at,
+    source: import.meta.env.DEV ? "local" : "release",
+  };
 }
-
-interface ReleaseAsset {
-  name: string;
-  browser_download_url: string;
-}
-
-interface ReleaseMeta {
-  tag_name: string;
-  published_at: string;
-  assets: ReleaseAsset[];
-}
-
-async function loadFromLatestRelease(): Promise<LoadResult> {
-  const release = await fetchJson<ReleaseMeta>(
-    `https://api.github.com/repos/${REPO}/releases/latest`,
-  );
-  const asset = release.assets.find((a) => a.name === "dashboard.json");
-  if (!asset) {
-    throw new Error(`release ${release.tag_name} has no dashboard.json asset`);
-  }
-
-  const stale = isStale(release.published_at, STALE_AFTER_DAYS);
-  const cached = readCache(release.tag_name);
-  if (cached) {
-    return { data: cached, stale, published_at: release.published_at, source: "release" };
-  }
-
-  const data = await fetchJson<Dashboard>(asset.browser_download_url);
-  writeCache(release.tag_name, data);
-  return { data, stale, published_at: release.published_at, source: "release" };
-}
-
-// ---------- helpers ----------
 
 async function fetchJson<T>(url: string): Promise<T> {
   const resp = await fetch(url);
@@ -154,31 +127,7 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await resp.json()) as T;
 }
 
-function isStale(publishedAt: string, maxAgeDays: number): boolean {
-  const ageMs = Date.now() - new Date(publishedAt).getTime();
+function isStale(generatedAt: string, maxAgeDays: number): boolean {
+  const ageMs = Date.now() - new Date(generatedAt).getTime();
   return ageMs > maxAgeDays * 24 * 60 * 60 * 1000;
-}
-
-interface CacheEntry {
-  tag: string;
-  data: Dashboard;
-}
-
-function readCache(tag: string): Dashboard | null {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const entry = JSON.parse(raw) as CacheEntry;
-    return entry.tag === tag ? entry.data : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeCache(tag: string, data: Dashboard): void {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ tag, data }));
-  } catch {
-    // localStorage may be unavailable (privacy mode / quota); non-fatal.
-  }
 }
