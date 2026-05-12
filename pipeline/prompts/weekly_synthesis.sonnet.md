@@ -36,7 +36,7 @@ If two clusters describe the same underlying pain (e.g., one about "flaky tests"
 # Hard rules
 
 - Strict JSON.
-- Exactly 10 entries in `top_10`. If fewer than 10 viable clusters exist after dedupe, repeat the strongest themes as separate angles rather than padding with garbage.
+- Aim for 10 entries in `top_10`. If fewer than 10 distinct opportunities exist (e.g., a sparse week with only 2–3 clusters), return as many as the data genuinely supports — minimum 1. Do not pad with fabricated angles.
 - Every entry must propose a v1 that's shippable in ≤90 days by a 1–2 person team. If a cluster's pain genuinely needs a larger team, frame the v1 as a focused wedge that proves the value.
 - Ground every claim in the cluster syntheses you receive; do not invent additional evidence.
 - `evidence_cluster_ids` must be cluster IDs that actually appeared in the input. Do not hallucinate IDs.

@@ -13,9 +13,16 @@ Pipeline + dashboard scaffolding are complete; the first real run is gated behin
 ## Setup (one-time, by the repository owner)
 
 1. **Enable GitHub Pages** — Settings → Pages → Source: **GitHub Actions**.
-2. **(Optional) Add the LLM secret** — Settings → Secrets and variables → Actions → New repository secret named `ANTHROPIC_API_KEY`. Without it the pipeline runs in heuristic-only mode and the dashboard shows a banner.
-3. **Trigger the first refresh manually** — Actions → "Weekly refresh" → Run workflow on `main`. This populates the first GitHub Release and triggers the Pages deploy.
-4. **Enable the weekly cron** (after a successful manual run) — edit `.github/workflows/refresh.yml`, uncomment the `schedule:` block, commit and push. See `BUILD_PROMPT.md` §13 Step 14.
+2. **Add the Reddit OAuth secrets** — Reddit blocks anonymous requests from GitHub-hosted IPs with 403, so app-only OAuth is required for Reddit ingestion.
+   - Sign in to Reddit → https://www.reddit.com/prefs/apps → "create another app" → type: **script** → fill the form (redirect URI can be `http://localhost`).
+   - Copy the **client ID** (under the app name) and **client secret**.
+   - In this repo, Settings → Secrets and variables → Actions → add:
+     - `REDDIT_CLIENT_ID`
+     - `REDDIT_CLIENT_SECRET`
+   - Without these the pipeline still runs, but every Reddit subreddit fetch will fail with 403 and the dataset will be HN/dev.to/Lobsters/Stack Exchange only.
+3. **(Optional) Add the LLM secret** — `ANTHROPIC_API_KEY`. Without it the pipeline runs in heuristic-only mode and the dashboard shows a banner.
+4. **Trigger the first refresh manually** — Actions → "Weekly refresh" → Run workflow on `main`. This populates the first GitHub Release and triggers the Pages deploy.
+5. **Enable the weekly cron** (after a successful manual run) — edit `.github/workflows/refresh.yml`, uncomment the `schedule:` block, commit and push. See `BUILD_PROMPT.md` §13 Step 14.
 
 ## Local development
 

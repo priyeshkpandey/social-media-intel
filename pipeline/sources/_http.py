@@ -38,12 +38,23 @@ class TransientHTTPError(RuntimeError):
     stop=stop_after_attempt(HTTP_MAX_RETRIES),
     reraise=True,
 )
-def get_json(url: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
-    """GET `url` and return the parsed JSON body."""
+def get_json(
+    url: str,
+    params: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """GET `url` and return the parsed JSON body.
+
+    Caller-supplied `headers` are merged on top of the defaults (User-Agent,
+    Accept) — useful for adding a Bearer token on a per-source basis.
+    """
+    merged_headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    if headers:
+        merged_headers.update(headers)
     response = requests.get(
         url,
         params=params,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        headers=merged_headers,
         timeout=HTTP_TIMEOUT_SECONDS,
     )
     if response.status_code in (429, 500, 502, 503, 504):

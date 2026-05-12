@@ -291,7 +291,10 @@ def _weekly_narrative(
     try:
         resp = client.messages.create(
             model=SONNET_MODEL,
-            max_tokens=4096,
+            # 16K leaves plenty of headroom for adaptive thinking + the JSON
+            # output. 4K was too tight: a previous run had a 95-second Sonnet
+            # call return a 200 with no text block (thinking ate the budget).
+            max_tokens=16000,
             thinking={"type": "adaptive"},
             system=system_prompt,
             messages=[{"role": "user", "content": json.dumps(payload)}],
@@ -307,11 +310,22 @@ def _weekly_narrative(
     cost = _sonnet_cost(resp.usage)
     text = _first_text(resp)
     if not text:
+        block_types = [getattr(b, "type", "?") for b in getattr(resp, "content", [])]
+        log.warning(
+            "synthesize: Sonnet returned no text block. "
+            "stop_reason=%s, block_types=%s, output_tokens=%s",
+            getattr(resp, "stop_reason", None),
+            block_types,
+            getattr(resp.usage, "output_tokens", None),
+        )
         return None, cost
     try:
         return json.loads(text), cost
     except json.JSONDecodeError:
-        log.exception("synthesize: malformed Sonnet narrative")
+        log.exception(
+            "synthesize: malformed Sonnet narrative (first 200 chars: %r)",
+            text[:200],
+        )
         return None, cost
 
 
