@@ -26,7 +26,7 @@ from pathlib import Path
 
 from pipeline.config import CACHE_DIR, OUT_DIR
 from pipeline.models import RawPost
-from pipeline.sources import devto, hackernews, lobsters, reddit, stackexchange
+from pipeline.sources import devto, hackernews, lemmy, lobsters, reddit, stackexchange
 from pipeline.stages import cluster as cluster_stage
 from pipeline.stages import dedupe as dedupe_stage
 from pipeline.stages import embed as embed_stage
@@ -61,6 +61,7 @@ def _ingest_all(since: datetime) -> Iterator[RawPost]:
     yield from devto.fetch(since)
     yield from lobsters.fetch(since)
     yield from stackexchange.fetch(since)
+    yield from lemmy.fetch(since)
 
 
 def main(argv: list[str] | None = None) -> int:

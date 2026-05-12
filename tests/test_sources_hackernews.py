@@ -117,3 +117,46 @@ def test_fetch_passes_since_timestamp(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured  # at least one call was made
     expected = f"created_at_i>{int(since.timestamp())}"
     assert all(p.get("numericFilters") == expected for p in captured)
+
+
+def test_fetch_includes_comment_tag(monkeypatch: pytest.MonkeyPatch) -> None:
+    """fetch() must query `tags=comment` for every HN_COMMENT_QUERIES entry."""
+    captured: list[dict[str, Any]] = []
+
+    def fake_get(url: str, params: Any = None) -> dict[str, Any]:
+        captured.append(params or {})
+        return {"hits": [], "nbPages": 0}
+
+    monkeypatch.setattr(hackernews, "get_json", fake_get)
+    list(hackernews.fetch(datetime(2026, 5, 1, tzinfo=UTC)))
+
+    comment_calls = [p for p in captured if p.get("tags") == "comment"]
+    story_calls = [p for p in captured if p.get("tags") == "story"]
+    ask_hn_calls = [p for p in captured if p.get("tags") == "ask_hn"]
+    # At least one of each tag type was hit.
+    assert comment_calls, "no comment-tag queries were dispatched"
+    assert story_calls
+    assert ask_hn_calls
+
+
+def test_to_raw_post_comment_hit_yields_body() -> None:
+    """A real HN comment payload (no title, only comment_text) maps cleanly."""
+    comment_hit = {
+        "objectID": "98765",
+        "title": None,
+        "story_text": None,
+        "comment_text": "On-call eats my entire weekend. We've lost 3 engineers to burnout this year.",
+        "author": "carla",
+        "created_at_i": 1747008000,
+        "points": None,
+        "num_comments": None,
+        "_tags": ["comment", "author_carla"],
+    }
+    p = hackernews._to_raw_post(comment_hit)
+    assert p is not None
+    assert p.id == "hn:98765"
+    assert "On-call" in p.text
+    assert "burnout" in p.text
+    # Comments don't carry points/replies in the Algolia payload — should be 0 not None.
+    assert p.score == 0
+    assert p.replies_count == 0

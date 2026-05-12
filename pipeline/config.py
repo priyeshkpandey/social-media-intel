@@ -80,6 +80,25 @@ HN_QUERIES: Final[tuple[str, ...]] = (
     "kubernetes",
 )
 
+# Pain-keyword queries used against HN *comments* (Algolia `tags=comment`).
+# Comments are where engineers actually vent and quantify cost — much higher
+# pain-signal density than stories. "Ask HN" / "Show HN" are dropped here
+# (those are title prefixes, not meaningful in comment full-text search).
+HN_COMMENT_QUERIES: Final[tuple[str, ...]] = (
+    "on-call",
+    "burnout",
+    "incident",
+    "outage",
+    "tech debt",
+    "legacy",
+    "estimate",
+    "stakeholder",
+    "roadmap",
+    "kubernetes",
+    "ci pipeline",
+    "deadline",
+)
+
 STACKEXCHANGE_SITE: Final[str] = "stackoverflow"
 STACKEXCHANGE_TAGS: Final[tuple[str, ...]] = (
     "ci-cd",
@@ -100,6 +119,17 @@ DEVTO_TAGS: Final[tuple[str, ...]] = (
 )
 
 LOBSTERS_RSS: Final[str] = "https://lobste.rs/rss"
+
+# Lemmy is a federated Reddit-clone with a public REST API per instance.
+# Each entry is (instance, community, role_hint). No auth required; data-center
+# IPs are fine. Picked for active dev-focused communities as of 2026-05.
+LEMMY_COMMUNITIES: Final[tuple[tuple[str, str, str], ...]] = (
+    ("programming.dev", "programming", "engineer"),
+    ("programming.dev", "devops", "devops"),
+    ("programming.dev", "asklemmy", "engineer"),
+    ("lemmy.ml", "programming", "engineer"),
+    ("lemmy.world", "programming", "engineer"),
+)
 
 # ---------------------------------------------------------------------------
 # Filter — Step 5

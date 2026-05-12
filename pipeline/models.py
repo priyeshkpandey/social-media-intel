@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Literal
 
-Source = Literal["reddit", "hackernews", "devto", "lobsters", "stackexchange"]
+Source = Literal["reddit", "hackernews", "devto", "lobsters", "stackexchange", "lemmy"]
 Feasibility = Literal["low", "medium", "high"]
 ImplCostBand = Literal["<$10k", "$10-100k", "$100k-1M", ">$1M"]
 CostKind = Literal["money", "time", "team"]

@@ -1,8 +1,15 @@
 """Hacker News source — Algolia HN Search API (free, no auth).
 
-For each query in config.HN_QUERIES, fetch both `story` and `ask_hn` tags
-since the cutoff timestamp. Algolia caps responses at 1000 hits per query;
-we paginate up to `nbPages` (typically <=10 pages of 100).
+Two ingestion paths share the same `_fetch_query` helper:
+
+  * Stories: each HN_QUERIES term against `tags=story` and `tags=ask_hn`.
+    Captures pain points framed as new posts.
+  * Comments: each HN_COMMENT_QUERIES term against `tags=comment`. Comments
+    are where engineers actually quantify cost and vent — higher pain-signal
+    density per token than stories. Added as a Reddit-alternative after
+    Reddit's Nov-2025 self-service API gating made Reddit ingest infeasible.
+
+Algolia caps each query at 1000 hits; we paginate up to 10 pages of 100.
 """
 
 from __future__ import annotations
@@ -12,7 +19,7 @@ from collections.abc import Iterator
 from datetime import UTC, datetime
 from typing import Any
 
-from pipeline.config import HN_QUERIES
+from pipeline.config import HN_COMMENT_QUERIES, HN_QUERIES
 from pipeline.models import RawPost
 from pipeline.sources._http import get_json
 
@@ -21,19 +28,27 @@ log = logging.getLogger(__name__)
 ALGOLIA_URL = "https://hn.algolia.com/api/v1/search_by_date"
 HITS_PER_PAGE = 100
 MAX_PAGES = 10
-TAGS_TO_SEARCH: tuple[str, ...] = ("story", "ask_hn")
+STORY_TAGS: tuple[str, ...] = ("story", "ask_hn")
 
 
 def fetch(since: datetime) -> Iterator[RawPost]:
-    """Yield every HN post newer than `since` matching any configured query."""
+    """Yield every HN post (story + comment) newer than `since`."""
     since_ts = int(since.timestamp())
+    # Stories + Ask HN
     for query in HN_QUERIES:
-        for tag in TAGS_TO_SEARCH:
+        for tag in STORY_TAGS:
             count = 0
             for post in _fetch_query(query, tag, since_ts):
                 count += 1
                 yield post
             log.info("hn: query=%r tag=%s yielded %d posts", query, tag, count)
+    # Comments — pain-keyword queries only
+    for query in HN_COMMENT_QUERIES:
+        count = 0
+        for post in _fetch_query(query, "comment", since_ts):
+            count += 1
+            yield post
+        log.info("hn: query=%r tag=comment yielded %d posts", query, count)
 
 
 def _fetch_query(query: str, tag: str, since_ts: int) -> Iterator[RawPost]:

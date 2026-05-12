@@ -68,9 +68,12 @@ These are v1 trade-offs surfaced during the first weeks of live operation. Each 
 
 ### Source coverage
 
-- **X (Twitter) and LinkedIn are deliberately excluded.** Pain points unique to those communities are invisible to this pipeline. The five proxy sources (Reddit, Hacker News, dev.to, Lobsters, Stack Overflow) cover ~80% of public developer-frustration discussion in our experience, but enterprise / non-engineer-PM voice is under-represented.
-- **Reddit requires app-only OAuth on GitHub Actions.** `old.reddit.com` returns 403 to data-center IPs (every GHA runner), so without the `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` secrets the dataset becomes HN + dev.to + Lobsters + Stack Exchange only. In that mode, dev.to dominates the raw ingest (≈3,000/week of mostly listicles + Show-HN-style posts), which the semantic filter then trims aggressively. See README → Setup for the secrets flow.
-- **HN is over-represented by query.** "Show HN" matches a lot of product launches that are not pain points. We rely on the semantic filter to drop these; if the filter loosens, HN noise will leak through.
+- **X (Twitter) and LinkedIn are deliberately excluded.** Pain points unique to those communities are invisible to this pipeline.
+- **Reddit ingest is currently gated.** Reddit ended self-service API-key creation in November 2025 under the "Responsible Builder Policy"; new OAuth applications require manual pre-approval. Until those credentials are granted, `pipeline/sources/reddit.py` runs but yields zero posts (every subreddit fetch 403s from data-center IPs).
+- **Reddit-alternative sources are wired up** to recover signal without Reddit:
+  - **HN comments** — `tags=comment` against pain-keyword queries (`HN_COMMENT_QUERIES` in `config.py`). Comments are where engineers actually quantify cost ("3 weeks", "$200k/month"), so signal density is higher than stories.
+  - **Lemmy** — federated Reddit-clone, public REST API per instance (`LEMMY_COMMUNITIES` in `config.py`). Lower volume than Reddit but dev-focused by construction. No auth required, works from data-center IPs.
+- **HN "Show HN" stories** are mostly product launches, not pain. We rely on the semantic filter to drop these; if the filter loosens, HN noise will leak through.
 
 ### Filter aggressiveness
 
