@@ -3,8 +3,13 @@ import "./styles.css";
 
 import type { Dashboard } from "./data";
 import { loadDashboard } from "./data";
+import { createDrilldownOpener } from "./render/drilldown";
+import { renderHeatmap } from "./render/heatmap";
 import { renderHero } from "./render/hero";
 import { renderKpi } from "./render/kpi";
+import { renderTable } from "./render/table";
+import { renderTimeseries } from "./render/timeseries";
+import { renderTreemap } from "./render/treemap";
 
 async function main(): Promise<void> {
   const app = document.getElementById("app");
@@ -18,7 +23,13 @@ async function main(): Promise<void> {
     if (result.data.heuristic_only) renderHeuristicBanner(app);
     renderKpi(app, result.data);
     renderHero(app, result.data);
-    renderPlaceholdersForStep11(app);
+
+    const openDrilldown = createDrilldownOpener(result.data);
+    renderTreemap(app, result.data, openDrilldown);
+    renderTimeseries(app, result.data);
+    renderHeatmap(app, result.data);
+    renderTable(app, result.data, openDrilldown);
+
     renderFooter(app, result.data);
   } catch (err) {
     renderError(app, err);
@@ -65,18 +76,6 @@ function renderHeuristicBanner(root: HTMLElement): void {
     ),
   );
   root.appendChild(banner);
-}
-
-function renderPlaceholdersForStep11(root: HTMLElement): void {
-  const section = document.createElement("section");
-  section.className = "smi-placeholder";
-  const h2 = document.createElement("h2");
-  h2.textContent = "Treemap, time series, demography heatmap, cluster table, drilldown";
-  const p = document.createElement("p");
-  p.textContent = "Wired up in Step 11.";
-  section.appendChild(h2);
-  section.appendChild(p);
-  root.appendChild(section);
 }
 
 function renderFooter(root: HTMLElement, dashboard: Dashboard): void {

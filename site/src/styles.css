@@ -14,7 +14,7 @@
 }
 
 main.container {
-  max-width: min(1200px, 95vw);
+  max-width: min(1400px, 96vw);
   padding-block: 1rem;
 }
 
@@ -195,20 +195,295 @@ main.container {
   font-size: 0.9rem;
 }
 
-/* ---------- placeholder + footer + error ---------- */
+/* ---------- chart sections ---------- */
 
-.smi-placeholder {
-  background: repeating-linear-gradient(
-    45deg,
-    transparent 0 10px,
-    rgba(0, 0, 0, 0.025) 10px 20px
-  );
-  border: 1px dashed var(--smi-card-border);
+.smi-chart-section {
+  margin-block: 1.75rem;
+}
+
+.smi-chart-section h2 {
+  margin-bottom: 0.25rem;
+}
+
+.smi-hint {
+  font-size: 0.85rem;
+  color: var(--pico-muted-color);
+  margin-bottom: 0.75rem;
+}
+
+.smi-chart-container {
+  width: 100%;
+  border: 1px solid var(--smi-card-border);
   border-radius: 8px;
+  background: var(--pico-card-background-color);
+}
+
+.smi-empty {
+  font-style: italic;
+  color: var(--pico-muted-color);
   padding: 1rem;
-  margin-block: 1.5rem;
+  text-align: center;
+}
+
+/* ---------- table ---------- */
+
+.smi-table-section {
+  margin-block: 1.75rem;
+}
+
+.smi-table-section h2 {
+  margin-bottom: 0.5rem;
+}
+
+.smi-table-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.smi-table-search {
+  max-width: 280px;
+  margin-bottom: 0;
+}
+
+.smi-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--smi-card-border);
+  border-radius: 8px;
+}
+
+.smi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.smi-table th,
+.smi-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--smi-card-border);
+}
+
+.smi-table thead th {
+  background: var(--pico-secondary-background);
+  font-weight: 600;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+
+.smi-th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.smi-th-sortable:hover {
+  background: var(--pico-secondary-hover-background, var(--pico-muted-border-color));
+}
+
+.smi-th-sortable.smi-sort-asc::after {
+  content: " ▲";
+  font-size: 0.7em;
   color: var(--pico-muted-color);
 }
+
+.smi-th-sortable.smi-sort-desc::after {
+  content: " ▼";
+  font-size: 0.7em;
+  color: var(--pico-muted-color);
+}
+
+.smi-cell-right {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.smi-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.smi-table tbody tr:hover,
+.smi-table tbody tr:focus {
+  background: var(--pico-secondary-background);
+  outline: none;
+}
+
+.smi-feas-high {
+  color: #1c4a1c;
+  font-weight: 600;
+}
+
+.smi-feas-low {
+  color: #6b0000;
+}
+
+.smi-feas-medium {
+  color: var(--pico-muted-color);
+}
+
+/* ---------- drilldown dialog ---------- */
+
+.smi-drilldown {
+  max-width: min(840px, 92vw);
+  max-height: 90vh;
+  border: 1px solid var(--smi-card-border);
+  border-radius: 10px;
+  padding: 0;
+  background: var(--pico-background-color);
+  color: var(--pico-color);
+}
+
+.smi-drilldown::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.smi-drilldown > * {
+  padding: 0.9rem 1.25rem;
+}
+
+.smi-drilldown-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--smi-card-border);
+  position: sticky;
+  top: 0;
+  background: var(--pico-background-color);
+  z-index: 1;
+}
+
+.smi-drilldown-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.smi-drilldown-sub {
+  margin: 0.25rem 0 0;
+  color: var(--pico-muted-color);
+  font-size: 0.95rem;
+}
+
+.smi-drilldown-close {
+  background: transparent;
+  border: none;
+  color: var(--pico-muted-color);
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0 0.4rem;
+  cursor: pointer;
+  width: auto;
+}
+
+.smi-drilldown-close:hover {
+  color: var(--pico-color);
+}
+
+.smi-drilldown h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pico-muted-color);
+  margin: 0 0 0.5rem 0;
+}
+
+.smi-dim-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.smi-dim-tile {
+  border: 1px solid var(--smi-card-border);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.smi-dim-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pico-muted-color);
+  margin: 0;
+}
+
+.smi-dim-value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.smi-dim-cost,
+.smi-dim-demo {
+  font-size: 0.9rem;
+  margin: 0.4rem 0;
+}
+
+.smi-dim-cost-meta {
+  color: var(--pico-muted-color);
+  font-size: 0.85rem;
+}
+
+.smi-drilldown-synthesis dl {
+  margin: 0;
+}
+
+.smi-drilldown-synthesis dt {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.smi-drilldown-synthesis dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  color: var(--pico-color);
+}
+
+.smi-synth-conf {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--pico-muted-color);
+}
+
+.smi-post-list {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.smi-post-item {
+  border-left: 3px solid var(--smi-card-border);
+  padding-left: 0.6rem;
+}
+
+.smi-post-meta {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--pico-muted-color);
+  margin-bottom: 0.2rem;
+}
+
+.smi-post-meta a {
+  font-weight: 500;
+}
+
+.smi-post-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+/* ---------- footer + error ---------- */
 
 .smi-footer {
   margin-block: 2rem 1rem;
