@@ -1,0 +1,1261 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-12T06:00:00+00:00",
+  "run_id": "v2026-20",
+  "heuristic_only": false,
+  "kpi": {
+    "total_posts_this_week": 60,
+    "active_clusters": 10,
+    "new_clusters_this_week": 0,
+    "mean_opportunity": 67.34
+  },
+  "narrative": {
+    "headline": "AI-assistant verification cost is becoming a line item \u2014 and pay-intent is rising.",
+    "top_10": [
+      {
+        "rank": 1,
+        "title": "Flaky test debugging tax",
+        "pain": "Engineers lose ~3 days per sprint retrying CI for tests that fail 1-in-30.",
+        "pitch": "VSCode + CI plugin that fingerprints flaky tests and shows per-test stability scores; ships as a v1 in 60 days.",
+        "why_now": "AI agents can now classify failure stack traces reliably enough to dedupe flake clusters.",
+        "target_role": "engineer",
+        "evidence_cluster_ids": [
+          "c-flaky-tests"
+        ],
+        "estimated_band": "<$10k"
+      },
+      {
+        "rank": 2,
+        "title": "Untraceable cloud cost spikes",
+        "pain": "Founders and platform engineers spend weeks attributing cost spikes to specific code paths.",
+        "pitch": "Trace-aware FinOps wedge: integrate with one APM, ship per-deploy cost diffs in 90 days.",
+        "why_now": "OpenTelemetry semantic conventions now stable enough to map traces to billable line items.",
+        "target_role": "founder",
+        "evidence_cluster_ids": [
+          "c-cloud-cost"
+        ],
+        "estimated_band": "$100k-1M"
+      },
+      {
+        "rank": 3,
+        "title": "On-call burnout retention risk",
+        "pain": "SREs cite resignations directly tied to pager load; alert tooling deduplicates poorly.",
+        "pitch": "Page-dedup agent that correlates alerts with recent deploys before they wake humans; integrates with PagerDuty.",
+        "why_now": "LLMs can do alert correlation that classical rule engines couldn't.",
+        "target_role": "sre",
+        "evidence_cluster_ids": [
+          "c-oncall"
+        ],
+        "estimated_band": "$10-100k"
+      },
+      {
+        "rank": 4,
+        "title": "AI assistant verification cost",
+        "pain": "Engineers spend more time verifying LLM output than they save writing it.",
+        "pitch": "Browser overlay that flags hallucination-prone completions (API names, deprecated args) in real-time.",
+        "why_now": "Tool-augmented LLMs can cross-check against current API docs at suggestion time.",
+        "target_role": "engineer",
+        "evidence_cluster_ids": [
+          "c-ai-debug"
+        ],
+        "estimated_band": "$10-100k"
+      },
+      {
+        "rank": 5,
+        "title": "SOC2 audit Q1 tax",
+        "pain": "Engineering teams lose 4\u20138 weeks gathering audit evidence even with 'automated' compliance tools.",
+        "pitch": "Continuous-evidence agent posting SOC2 proofs straight to the auditor portal from CI/IaC events.",
+        "why_now": "Auditors now accept API-delivered evidence; the previous human bottleneck is gone.",
+        "target_role": "founder",
+        "evidence_cluster_ids": [
+          "c-soc2"
+        ],
+        "estimated_band": "$100k-1M"
+      },
+      {
+        "rank": 6,
+        "title": "Documentation rot onboarding tax",
+        "pain": "New hires lose ~1 day/week to stale runbooks during ramp-up.",
+        "pitch": "Doc-freshness agent watching code drift vs README references; opens PRs with proposed updates.",
+        "why_now": "LLMs can finally write diffs against existing prose without breaking the surrounding context.",
+        "target_role": "engineer",
+        "evidence_cluster_ids": [
+          "c-doc-rot"
+        ],
+        "estimated_band": "<$10k"
+      },
+      {
+        "rank": 7,
+        "title": "Sales-overridden product roadmap",
+        "pain": "PMs report 40%+ of quarterly roadmap is reactive sales escalations.",
+        "pitch": "Roadmap dashboard scoring requests by ARR impact + strategic alignment; flags when reactive work exceeds threshold.",
+        "why_now": "PM tools now have the data; nobody's tied it to a strategic-alignment signal.",
+        "target_role": "product_manager",
+        "evidence_cluster_ids": [
+          "c-pm-roadmap"
+        ],
+        "estimated_band": "$10-100k"
+      },
+      {
+        "rank": 8,
+        "title": "QA can't keep up",
+        "pain": "QA teams of 3 fall behind feature shipping; regressions slip into production.",
+        "pitch": "Spec-from-PR test generator reading PR descriptions and producing prioritized integration test lists for QA.",
+        "why_now": "LLMs can now reliably translate prose specs into Playwright/Cypress test stubs.",
+        "target_role": "qa",
+        "evidence_cluster_ids": [
+          "c-qa-velocity"
+        ],
+        "estimated_band": "$10-100k"
+      },
+      {
+        "rank": 9,
+        "title": "Legacy refactor paralysis",
+        "pain": "Senior engineers can't get buy-in for refactors because the cost is visible but the deferred maintenance cost isn't.",
+        "pitch": "Tech-debt impact calculator linking hot-spot files to incident frequency and PR latency.",
+        "why_now": "Repo-mining is cheap now; tying it to PagerDuty + GitHub gives a quantified case.",
+        "target_role": "engineer",
+        "evidence_cluster_ids": [
+          "c-legacy-refactor"
+        ],
+        "estimated_band": "$100k-1M"
+      },
+      {
+        "rank": 10,
+        "title": "Kubernetes complexity tax",
+        "pain": "Two-engineer platform teams stuck maintaining k8s rather than shipping platform features.",
+        "pitch": "K8s-to-PaaS migration assistant auditing manifests and generating Fly/Render equivalents with parity checks.",
+        "why_now": "Cloud Run / Fly / Render reached k8s parity for ~80% of common workloads.",
+        "target_role": "devops",
+        "evidence_cluster_ids": [
+          "c-kubernetes-tax"
+        ],
+        "estimated_band": "$100k-1M"
+      }
+    ],
+    "honorable_mentions": [
+      "Database migration anxiety on live systems",
+      "Estimation friction with non-technical stakeholders",
+      "Customer onboarding manual labor",
+      "Build-versus-buy decision fatigue"
+    ]
+  },
+  "clusters": [
+    {
+      "id": "c-flaky-tests",
+      "label": "flaky / tests / ci",
+      "title": "Flaky test debugging tax",
+      "frequency_per_week": 12.3,
+      "frequency_zscore": 2.1,
+      "opportunity": 88.5,
+      "feasibility": "high",
+      "impl_cost_band": "<$10k",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": 3.0,
+        "team_median_people": null,
+        "sample_count": 8,
+        "summary": "~3 day(s)"
+      },
+      "role_top": [
+        {
+          "role": "engineer",
+          "share": 0.62
+        },
+        {
+          "role": "sre",
+          "share": 0.22
+        },
+        {
+          "role": "devops",
+          "share": 0.16
+        }
+      ],
+      "first_seen": "2025-08-05T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "Flaky test debugging tax",
+        "one_line_pain": "Engineers lose ~3 days per sprint to retrying CI for tests that fail 1-in-30; teams accept it rather than fix it.",
+        "role_demographics": "Mostly mid-to-senior ICs in 5\u201310 engineer teams; SREs and devops co-own the CI pipeline.",
+        "perceived_cost_summary": "3 engineer-days per sprint per team; explicit pay-intent in multiple posts.",
+        "feasibility": "high",
+        "implementation_cost_band": "<$10k",
+        "opportunity_pitch": "VSCode + CI plugin that fingerprints flaky tests by failure pattern and shows a stability dashboard with per-test confidence scores.",
+        "confidence": 0.82
+      },
+      "representative_posts": [
+        {
+          "id": "c-flaky-tests-p0",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-flaky-tests-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about flaky / tests / ci. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-flaky-tests-p1",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-flaky-tests-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about flaky / tests / ci. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-flaky-tests-p2",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-flaky-tests-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about flaky / tests / ci. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-flaky-tests-p3",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-flaky-tests-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about flaky / tests / ci. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-flaky-tests-p4",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-flaky-tests-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about flaky / tests / ci. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-flaky-tests-p5",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-flaky-tests-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about flaky / tests / ci. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-cloud-cost",
+      "label": "cloud / bill / aws",
+      "title": "Untraceable cloud cost spikes",
+      "frequency_per_week": 8.7,
+      "frequency_zscore": 1.5,
+      "opportunity": 81.2,
+      "feasibility": "high",
+      "impl_cost_band": "$100k-1M",
+      "cost": {
+        "money_median_usd": 200000.0,
+        "time_median_days": 14.0,
+        "team_median_people": 3.0,
+        "sample_count": 11,
+        "summary": "~$200k, ~14 day(s), team of ~3"
+      },
+      "role_top": [
+        {
+          "role": "engineer",
+          "share": 0.4
+        },
+        {
+          "role": "founder",
+          "share": 0.3
+        },
+        {
+          "role": "devops",
+          "share": 0.25
+        },
+        {
+          "role": "sre",
+          "share": 0.05
+        }
+      ],
+      "first_seen": "2025-06-26T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "Untraceable cloud cost spikes",
+        "one_line_pain": "Engineers and founders cannot attribute cost spikes to specific code paths or features without weeks of manual investigation.",
+        "role_demographics": "Mix of senior platform engineers debugging spikes and SaaS founders trying to do unit-economics attribution.",
+        "perceived_cost_summary": "Six-figure monthly bills with multi-week investigations; existing FinOps tools surface 'what' but not 'why'.",
+        "feasibility": "high",
+        "implementation_cost_band": "$100k-1M",
+        "opportunity_pitch": "Trace-aware cloud cost attribution: ties each dollar of infra spend to the feature, deploy, and consumer group that caused it.",
+        "confidence": 0.78
+      },
+      "representative_posts": [
+        {
+          "id": "c-cloud-cost-p0",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-cloud-cost-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about cloud / bill / aws. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-cloud-cost-p1",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-cloud-cost-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about cloud / bill / aws. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-cloud-cost-p2",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-cloud-cost-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about cloud / bill / aws. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-cloud-cost-p3",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-cloud-cost-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about cloud / bill / aws. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-cloud-cost-p4",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-cloud-cost-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about cloud / bill / aws. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-cloud-cost-p5",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-cloud-cost-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about cloud / bill / aws. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-oncall",
+      "label": "oncall / burnout / pager",
+      "title": "On-call burnout retention risk",
+      "frequency_per_week": 9.1,
+      "frequency_zscore": 1.6,
+      "opportunity": 78.4,
+      "feasibility": "medium",
+      "impl_cost_band": "$10-100k",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": 2.0,
+        "team_median_people": 4.0,
+        "sample_count": 6,
+        "summary": "~2 day(s), team of ~4"
+      },
+      "role_top": [
+        {
+          "role": "sre",
+          "share": 0.55
+        },
+        {
+          "role": "devops",
+          "share": 0.25
+        },
+        {
+          "role": "engineer",
+          "share": 0.2
+        }
+      ],
+      "first_seen": "2025-05-12T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "On-call burnout retention risk",
+        "one_line_pain": "SREs are getting paged 4\u20136 times per shift; multiple posts cite resignations directly tied to pager load.",
+        "role_demographics": "Primarily SRE / DevOps at scale-ups (50\u2013200 engineers).",
+        "perceived_cost_summary": "Estimated 2-day productivity loss per major incident; turnover costs implied but unquantified.",
+        "feasibility": "medium",
+        "implementation_cost_band": "$10-100k",
+        "opportunity_pitch": "On-call triage agent that auto-correlates incoming alerts with recent deploys and dedupes pages before they wake humans.",
+        "confidence": 0.71
+      },
+      "representative_posts": [
+        {
+          "id": "c-oncall-p0",
+          "source": "reddit",
+          "role": "sre",
+          "url": "https://example.com/c-oncall-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about oncall / burnout / pager. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-oncall-p1",
+          "source": "hackernews",
+          "role": "sre",
+          "url": "https://example.com/c-oncall-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about oncall / burnout / pager. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-oncall-p2",
+          "source": "devto",
+          "role": "sre",
+          "url": "https://example.com/c-oncall-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about oncall / burnout / pager. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-oncall-p3",
+          "source": "reddit",
+          "role": "sre",
+          "url": "https://example.com/c-oncall-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about oncall / burnout / pager. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-oncall-p4",
+          "source": "hackernews",
+          "role": "sre",
+          "url": "https://example.com/c-oncall-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about oncall / burnout / pager. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-oncall-p5",
+          "source": "devto",
+          "role": "sre",
+          "url": "https://example.com/c-oncall-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about oncall / burnout / pager. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-soc2",
+      "label": "soc2 / compliance / audit",
+      "title": "SOC2 audit prep eats Q1",
+      "frequency_per_week": 6.4,
+      "frequency_zscore": 1.1,
+      "opportunity": 72.0,
+      "feasibility": "medium",
+      "impl_cost_band": "$100k-1M",
+      "cost": {
+        "money_median_usd": 80000.0,
+        "time_median_days": 42.0,
+        "team_median_people": 2.0,
+        "sample_count": 7,
+        "summary": "~$80k, ~42 day(s), team of ~2"
+      },
+      "role_top": [
+        {
+          "role": "founder",
+          "share": 0.4
+        },
+        {
+          "role": "engineer",
+          "share": 0.3
+        },
+        {
+          "role": "security",
+          "share": 0.3
+        }
+      ],
+      "first_seen": "2025-10-24T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "SOC2 audit prep eats Q1",
+        "one_line_pain": "Engineering teams burn 4\u20138 weeks gathering evidence for SOC2 audits despite having tools that 'automate' the process.",
+        "role_demographics": "Mostly Series A\u2013B SaaS founders and lead engineers prepping for enterprise deals.",
+        "perceived_cost_summary": "$80k vendor spend plus ~6 weeks of two engineers; second-year audits aren't dramatically faster.",
+        "feasibility": "medium",
+        "implementation_cost_band": "$100k-1M",
+        "opportunity_pitch": "Continuous-evidence agent that watches CI/IaC events and posts SOC2-relevant proofs to your auditor's portal automatically.",
+        "confidence": 0.64
+      },
+      "representative_posts": [
+        {
+          "id": "c-soc2-p0",
+          "source": "reddit",
+          "role": "founder",
+          "url": "https://example.com/c-soc2-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about soc2 / compliance / audit. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-soc2-p1",
+          "source": "hackernews",
+          "role": "founder",
+          "url": "https://example.com/c-soc2-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about soc2 / compliance / audit. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-soc2-p2",
+          "source": "devto",
+          "role": "founder",
+          "url": "https://example.com/c-soc2-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about soc2 / compliance / audit. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-soc2-p3",
+          "source": "reddit",
+          "role": "founder",
+          "url": "https://example.com/c-soc2-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about soc2 / compliance / audit. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-soc2-p4",
+          "source": "hackernews",
+          "role": "founder",
+          "url": "https://example.com/c-soc2-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about soc2 / compliance / audit. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-soc2-p5",
+          "source": "devto",
+          "role": "founder",
+          "url": "https://example.com/c-soc2-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about soc2 / compliance / audit. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-pm-roadmap",
+      "label": "roadmap / sales / escalation",
+      "title": "Sales-overridden product roadmap",
+      "frequency_per_week": 5.7,
+      "frequency_zscore": 0.9,
+      "opportunity": 68.5,
+      "feasibility": "medium",
+      "impl_cost_band": "$10-100k",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": null,
+        "team_median_people": null,
+        "sample_count": 3,
+        "summary": "no cost data"
+      },
+      "role_top": [
+        {
+          "role": "product_manager",
+          "share": 0.55
+        },
+        {
+          "role": "manager",
+          "share": 0.25
+        },
+        {
+          "role": "engineer",
+          "share": 0.2
+        }
+      ],
+      "first_seen": "2025-11-13T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "Sales-overridden product roadmap",
+        "one_line_pain": "PMs report 40%+ of quarterly roadmap is reactive sales escalations; long-term bets get permanently deferred.",
+        "role_demographics": "Mostly senior PMs and engineering managers at $5M\u2013$50M ARR SaaS companies.",
+        "perceived_cost_summary": "No hard dollar figure; framed as opportunity cost and team morale loss.",
+        "feasibility": "medium",
+        "implementation_cost_band": "$10-100k",
+        "opportunity_pitch": "Roadmap dashboard that scores each request by ARR impact + strategic alignment, flagging when reactive work exceeds a configurable threshold.",
+        "confidence": 0.58
+      },
+      "representative_posts": [
+        {
+          "id": "c-pm-roadmap-p0",
+          "source": "reddit",
+          "role": "product_manager",
+          "url": "https://example.com/c-pm-roadmap-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about roadmap / sales / escalation. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-pm-roadmap-p1",
+          "source": "hackernews",
+          "role": "product_manager",
+          "url": "https://example.com/c-pm-roadmap-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about roadmap / sales / escalation. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-pm-roadmap-p2",
+          "source": "devto",
+          "role": "product_manager",
+          "url": "https://example.com/c-pm-roadmap-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about roadmap / sales / escalation. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-pm-roadmap-p3",
+          "source": "reddit",
+          "role": "product_manager",
+          "url": "https://example.com/c-pm-roadmap-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about roadmap / sales / escalation. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-pm-roadmap-p4",
+          "source": "hackernews",
+          "role": "product_manager",
+          "url": "https://example.com/c-pm-roadmap-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about roadmap / sales / escalation. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-pm-roadmap-p5",
+          "source": "devto",
+          "role": "product_manager",
+          "url": "https://example.com/c-pm-roadmap-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about roadmap / sales / escalation. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-legacy-refactor",
+      "label": "legacy / refactor / monolith",
+      "title": "Legacy code refactoring paralysis",
+      "frequency_per_week": 4.2,
+      "frequency_zscore": 0.6,
+      "opportunity": 64.0,
+      "feasibility": "medium",
+      "impl_cost_band": "$100k-1M",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": 90.0,
+        "team_median_people": 6.0,
+        "sample_count": 4,
+        "summary": "~90 day(s), team of ~6"
+      },
+      "role_top": [
+        {
+          "role": "engineer",
+          "share": 0.65
+        },
+        {
+          "role": "manager",
+          "share": 0.35
+        }
+      ],
+      "first_seen": "2025-09-14T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "Legacy code refactoring paralysis",
+        "one_line_pain": "Senior engineers can't get buy-in for refactors because the cost is visible and the deferred maintenance cost isn't.",
+        "role_demographics": "Mostly tenured ICs and engineering managers at companies 5+ years old.",
+        "perceived_cost_summary": "Quarter-scale refactor projects routinely cited; rarely completed within original estimate.",
+        "feasibility": "medium",
+        "implementation_cost_band": "$100k-1M",
+        "opportunity_pitch": "Tech-debt impact calculator that ties hot-spot files to incident frequency and PR latency, giving managers a quantified case for refactor budget.",
+        "confidence": 0.55
+      },
+      "representative_posts": [
+        {
+          "id": "c-legacy-refactor-p0",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-legacy-refactor-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about legacy / refactor / monolith. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-legacy-refactor-p1",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-legacy-refactor-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about legacy / refactor / monolith. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-legacy-refactor-p2",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-legacy-refactor-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about legacy / refactor / monolith. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-legacy-refactor-p3",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-legacy-refactor-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about legacy / refactor / monolith. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-legacy-refactor-p4",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-legacy-refactor-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about legacy / refactor / monolith. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-legacy-refactor-p5",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-legacy-refactor-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about legacy / refactor / monolith. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-doc-rot",
+      "label": "documentation / outdated / wiki",
+      "title": "Documentation rot tax on new hires",
+      "frequency_per_week": 4.8,
+      "frequency_zscore": 0.7,
+      "opportunity": 58.5,
+      "feasibility": "high",
+      "impl_cost_band": "<$10k",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": 1.0,
+        "team_median_people": null,
+        "sample_count": 5,
+        "summary": "~1 day(s)"
+      },
+      "role_top": [
+        {
+          "role": "engineer",
+          "share": 0.5
+        },
+        {
+          "role": "manager",
+          "share": 0.3
+        },
+        {
+          "role": "qa",
+          "share": 0.2
+        }
+      ],
+      "first_seen": "2025-12-13T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "Documentation rot tax on new hires",
+        "one_line_pain": "New hires lose ~1 day per week onboarding through stale runbooks; rewrites stall because no one owns docs.",
+        "role_demographics": "ICs across roles; managers chime in about ramp-up cost.",
+        "perceived_cost_summary": "Per-new-hire onboarding loss ~1 day/week for the first month; pay-intent present.",
+        "feasibility": "high",
+        "implementation_cost_band": "<$10k",
+        "opportunity_pitch": "Doc freshness agent that watches code drift vs README/runbook references and opens PRs with proposed updates.",
+        "confidence": 0.69
+      },
+      "representative_posts": [
+        {
+          "id": "c-doc-rot-p0",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-doc-rot-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about documentation / outdated / wiki. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-doc-rot-p1",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-doc-rot-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about documentation / outdated / wiki. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-doc-rot-p2",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-doc-rot-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about documentation / outdated / wiki. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-doc-rot-p3",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-doc-rot-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about documentation / outdated / wiki. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-doc-rot-p4",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-doc-rot-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about documentation / outdated / wiki. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-doc-rot-p5",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-doc-rot-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about documentation / outdated / wiki. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-ai-debug",
+      "label": "ai / hallucination / debug",
+      "title": "AI coding-assistant verification cost",
+      "frequency_per_week": 7.1,
+      "frequency_zscore": 1.3,
+      "opportunity": 56.2,
+      "feasibility": "high",
+      "impl_cost_band": "$10-100k",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": 0.5,
+        "team_median_people": null,
+        "sample_count": 9,
+        "summary": "~0 day(s)"
+      },
+      "role_top": [
+        {
+          "role": "engineer",
+          "share": 0.75
+        },
+        {
+          "role": "data",
+          "share": 0.25
+        }
+      ],
+      "first_seen": "2026-03-13T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "AI coding-assistant verification cost",
+        "one_line_pain": "Engineers spend more time verifying LLM-generated code than they save writing it; net-negative for tricky tasks.",
+        "role_demographics": "Mostly senior backend / data engineers using Copilot/Cursor daily.",
+        "perceived_cost_summary": "Self-reported ~4 hours/week of verification time; widely complained about.",
+        "feasibility": "high",
+        "implementation_cost_band": "$10-100k",
+        "opportunity_pitch": "Trust-scored AI assistant overlay that flags hallucination-prone completions (API names, magic numbers, deprecated args) before they hit your editor.",
+        "confidence": 0.66
+      },
+      "representative_posts": [
+        {
+          "id": "c-ai-debug-p0",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-ai-debug-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about ai / hallucination / debug. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-ai-debug-p1",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-ai-debug-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about ai / hallucination / debug. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-ai-debug-p2",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-ai-debug-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about ai / hallucination / debug. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-ai-debug-p3",
+          "source": "reddit",
+          "role": "engineer",
+          "url": "https://example.com/c-ai-debug-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about ai / hallucination / debug. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-ai-debug-p4",
+          "source": "hackernews",
+          "role": "engineer",
+          "url": "https://example.com/c-ai-debug-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about ai / hallucination / debug. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-ai-debug-p5",
+          "source": "devto",
+          "role": "engineer",
+          "url": "https://example.com/c-ai-debug-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about ai / hallucination / debug. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-kubernetes-tax",
+      "label": "kubernetes / complexity / yaml",
+      "title": "Kubernetes complexity tax",
+      "frequency_per_week": 5.5,
+      "frequency_zscore": 0.8,
+      "opportunity": 54.8,
+      "feasibility": "medium",
+      "impl_cost_band": "$100k-1M",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": null,
+        "team_median_people": 2.0,
+        "sample_count": 3,
+        "summary": "team of ~2"
+      },
+      "role_top": [
+        {
+          "role": "devops",
+          "share": 0.45
+        },
+        {
+          "role": "sre",
+          "share": 0.3
+        },
+        {
+          "role": "engineer",
+          "share": 0.25
+        }
+      ],
+      "first_seen": "2025-04-07T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "Kubernetes complexity tax",
+        "one_line_pain": "Platform teams of 2 spend most of their week keeping Kubernetes running rather than shipping platform features for app teams.",
+        "role_demographics": "Devops / SRE at mid-sized companies that adopted k8s 'because everyone else did'.",
+        "perceived_cost_summary": "Two-engineer team essentially fully committed to k8s upkeep; no quantified per-incident cost.",
+        "feasibility": "medium",
+        "implementation_cost_band": "$100k-1M",
+        "opportunity_pitch": "K8s-to-PaaS migration assistant that audits your manifests and generates Fly/Render/Cloud Run equivalents with parity verification.",
+        "confidence": 0.52
+      },
+      "representative_posts": [
+        {
+          "id": "c-kubernetes-tax-p0",
+          "source": "reddit",
+          "role": "devops",
+          "url": "https://example.com/c-kubernetes-tax-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about kubernetes / complexity / yaml. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-kubernetes-tax-p1",
+          "source": "hackernews",
+          "role": "devops",
+          "url": "https://example.com/c-kubernetes-tax-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about kubernetes / complexity / yaml. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-kubernetes-tax-p2",
+          "source": "devto",
+          "role": "devops",
+          "url": "https://example.com/c-kubernetes-tax-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about kubernetes / complexity / yaml. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-kubernetes-tax-p3",
+          "source": "reddit",
+          "role": "devops",
+          "url": "https://example.com/c-kubernetes-tax-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about kubernetes / complexity / yaml. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-kubernetes-tax-p4",
+          "source": "hackernews",
+          "role": "devops",
+          "url": "https://example.com/c-kubernetes-tax-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about kubernetes / complexity / yaml. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-kubernetes-tax-p5",
+          "source": "devto",
+          "role": "devops",
+          "url": "https://example.com/c-kubernetes-tax-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about kubernetes / complexity / yaml. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    },
+    {
+      "id": "c-qa-velocity",
+      "label": "qa / regression / velocity",
+      "title": "QA can't keep up with feature velocity",
+      "frequency_per_week": 3.9,
+      "frequency_zscore": 0.4,
+      "opportunity": 51.3,
+      "feasibility": "high",
+      "impl_cost_band": "$10-100k",
+      "cost": {
+        "money_median_usd": null,
+        "time_median_days": 5.0,
+        "team_median_people": 3.0,
+        "sample_count": 4,
+        "summary": "~5 day(s), team of ~3"
+      },
+      "role_top": [
+        {
+          "role": "qa",
+          "share": 0.6
+        },
+        {
+          "role": "engineer",
+          "share": 0.25
+        },
+        {
+          "role": "manager",
+          "share": 0.15
+        }
+      ],
+      "first_seen": "2026-01-22T06:00:00+00:00",
+      "last_seen": "2026-05-11T06:00:00+00:00",
+      "post_count": 6,
+      "synthesis": {
+        "title": "QA can't keep up with feature velocity",
+        "one_line_pain": "QA teams of 3 fall behind feature shipping; regressions slip through into production each cycle.",
+        "role_demographics": "Mostly QA leads and engineering managers at 50\u2013200 engineer orgs.",
+        "perceived_cost_summary": "5 engineer-day cycles cited; consistent across multiple posts.",
+        "feasibility": "high",
+        "implementation_cost_band": "$10-100k",
+        "opportunity_pitch": "Spec-from-PR test generator that reads PR descriptions and produces a prioritized list of integration tests for QA to focus on this sprint.",
+        "confidence": 0.6
+      },
+      "representative_posts": [
+        {
+          "id": "c-qa-velocity-p0",
+          "source": "reddit",
+          "role": "qa",
+          "url": "https://example.com/c-qa-velocity-p0",
+          "score": 50,
+          "replies_count": 20,
+          "text": "Sample post 1 about qa / regression / velocity. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-11T06:00:00+00:00",
+          "sentiment": -0.3
+        },
+        {
+          "id": "c-qa-velocity-p1",
+          "source": "hackernews",
+          "role": "qa",
+          "url": "https://example.com/c-qa-velocity-p1",
+          "score": 43,
+          "replies_count": 17,
+          "text": "Sample post 2 about qa / regression / velocity. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-10T06:00:00+00:00",
+          "sentiment": -0.35
+        },
+        {
+          "id": "c-qa-velocity-p2",
+          "source": "devto",
+          "role": "qa",
+          "url": "https://example.com/c-qa-velocity-p2",
+          "score": 36,
+          "replies_count": 14,
+          "text": "Sample post 3 about qa / regression / velocity. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-09T06:00:00+00:00",
+          "sentiment": -0.4
+        },
+        {
+          "id": "c-qa-velocity-p3",
+          "source": "reddit",
+          "role": "qa",
+          "url": "https://example.com/c-qa-velocity-p3",
+          "score": 29,
+          "replies_count": 11,
+          "text": "Sample post 4 about qa / regression / velocity. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-08T06:00:00+00:00",
+          "sentiment": -0.45
+        },
+        {
+          "id": "c-qa-velocity-p4",
+          "source": "hackernews",
+          "role": "qa",
+          "url": "https://example.com/c-qa-velocity-p4",
+          "score": 22,
+          "replies_count": 8,
+          "text": "Sample post 5 about qa / regression / velocity. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-07T06:00:00+00:00",
+          "sentiment": -0.5
+        },
+        {
+          "id": "c-qa-velocity-p5",
+          "source": "devto",
+          "role": "qa",
+          "url": "https://example.com/c-qa-velocity-p5",
+          "score": 15,
+          "replies_count": 5,
+          "text": "Sample post 6 about qa / regression / velocity. This is filler text. This is filler text. This is filler text. This is filler text. ",
+          "posted_at": "2026-05-06T06:00:00+00:00",
+          "sentiment": -0.55
+        }
+      ]
+    }
+  ]
+}

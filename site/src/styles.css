@@ -1,4 +1,227 @@
-/* Overrides on top of Pico.css. Step 1 stub. */
+/* Overrides on top of Pico.css. */
+
 :root {
-  --pico-font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --pico-font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --smi-rank-bg: var(--pico-primary);
+  --smi-card-border: var(--pico-muted-border-color);
+  --smi-warn-bg: #fff4e0;
+  --smi-warn-fg: #6b3a00;
+  --smi-info-bg: #e6f1ff;
+  --smi-info-fg: #0a3a73;
+  --smi-error-bg: #ffe9e9;
+  --smi-error-fg: #6b0000;
+}
+
+main.container {
+  max-width: min(1200px, 95vw);
+  padding-block: 1rem;
+}
+
+/* ---------- header ---------- */
+
+.smi-header h1 {
+  margin-bottom: 0.25rem;
+}
+
+.smi-subhead {
+  color: var(--pico-muted-color);
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.smi-stale {
+  background: var(--smi-warn-bg);
+  color: var(--smi-warn-fg);
+  border-left: 4px solid #f7a13d;
+  padding: 0.6rem 0.8rem;
+  margin-block: 0.75rem 0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.smi-heuristic-banner {
+  background: var(--smi-info-bg);
+  color: var(--smi-info-fg);
+  border-left: 4px solid #4a90e2;
+  padding: 0.6rem 0.8rem;
+  margin-block: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* ---------- KPI strip ---------- */
+
+.smi-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-block: 1.25rem;
+}
+
+.smi-kpi-tile {
+  background: var(--pico-card-background-color);
+  border: 1px solid var(--smi-card-border);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin: 0;
+}
+
+.smi-kpi-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pico-muted-color);
+  margin: 0;
+}
+
+.smi-kpi-value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0.2rem 0 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- hero ---------- */
+
+.smi-hero h2 {
+  margin-bottom: 0.25rem;
+}
+
+.smi-headline {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--pico-muted-color);
+  margin-bottom: 1rem;
+}
+
+.smi-headline-fallback {
+  font-style: normal;
+}
+
+.smi-opportunity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0.9rem;
+}
+
+.smi-opportunity-card {
+  border: 1px solid var(--smi-card-border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.smi-opportunity-card header {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+
+.smi-opportunity-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.smi-rank {
+  background: var(--smi-rank-bg);
+  color: #fff;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.smi-opportunity-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.smi-opportunity-card footer {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.smi-badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+  border: 1px solid var(--smi-card-border);
+}
+
+.smi-badge-role {
+  background: #eef6ee;
+  color: #1c4a1c;
+  border-color: #cce5cc;
+}
+
+.smi-badge-band {
+  background: #fff4cc;
+  color: #6b5300;
+  border-color: #f0dc7a;
+}
+
+.smi-badge-feasibility {
+  background: #e7eeff;
+  color: #1c3973;
+  border-color: #c0d2ff;
+}
+
+.smi-honorable {
+  margin-top: 1rem;
+}
+
+.smi-honorable h4 {
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pico-muted-color);
+}
+
+.smi-honorable ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+
+/* ---------- placeholder + footer + error ---------- */
+
+.smi-placeholder {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent 0 10px,
+    rgba(0, 0, 0, 0.025) 10px 20px
+  );
+  border: 1px dashed var(--smi-card-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-block: 1.5rem;
+  color: var(--pico-muted-color);
+}
+
+.smi-footer {
+  margin-block: 2rem 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--smi-card-border);
+  font-size: 0.85rem;
+  color: var(--pico-muted-color);
+}
+
+.smi-error {
+  background: var(--smi-error-bg);
+  color: var(--smi-error-fg);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #c0392b;
 }
