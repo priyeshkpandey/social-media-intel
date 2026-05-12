@@ -52,6 +52,16 @@ Implemented in `pipeline/stages/synthesize.py`. Env-gated by `ANTHROPIC_API_KEY`
 - **Budget cap:** `SYNTHESIS_BUDGET_USD = 1.00` per run. After each API call, cost is accumulated from `usage.input_tokens`, `output_tokens`, `cache_creation_input_tokens`, and `cache_read_input_tokens` against per-1M-token prices in `config.py`. Once `spent ≥ budget`, remaining Haiku calls are skipped and the Sonnet call is suppressed.
 - **Failure handling:** any per-call exception or malformed JSON drops that cluster back to heuristic-only output (its `synthesis` field stays `None`). The narrative call is suppressed when every cluster fell back.
 
+## Artifacts (Step 9)
+
+Each weekly run emits three files to `./out/`:
+
+- **`dashboard.json`** (≤2MB target) — schema-versioned (`schema_version: 1`) JSON the static site renders directly. Contains: `run_id` (`vYYYY-WW` ISO week), `generated_at`, `heuristic_only` (bool, true when no cluster received LLM refinement), `kpi` (`total_posts_this_week`, `active_clusters`, `new_clusters_this_week` over a 7-day window, `mean_opportunity`), `narrative` (the Sonnet Top-10 object or `null`), and `clusters[]`. Each cluster carries its full scored fields plus up to **10 representative posts** sorted by score, with text truncated to 500 chars + ellipsis. Full text lives in `raw.parquet`.
+- **`clusters.parquet`** — one row per cluster with nested fields (`cost`, `role_top`, `synthesis`) serialized to JSON-string columns for compact pyarrow storage.
+- **`raw.parquet`** — one row per normalized post. Includes a `cluster_id` column (nullable for posts that were filtered out before clustering) so the artifact is self-joinable.
+
+The 12-month rolling time series is reconstructed at render time by fetching prior GitHub Releases — `dashboard.json` only carries the current run's slice.
+
 ## Limitations
 
 _To be filled in after Step 13._
@@ -59,3 +69,4 @@ _To be filled in after Step 13._
 - Proxy sources are not a 1:1 substitute for X/LinkedIn coverage.
 - Free-tier API rate limits constrain weekly volume.
 - Cluster stability across weeks is centroid-based and can drift; see Step 6 notes when written.
+- `frequency_per_week` and `frequency_zscore` are batch-local; long-window trends require stitching prior dashboard.json releases at render time.
