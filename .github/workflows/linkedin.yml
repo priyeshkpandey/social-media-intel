@@ -45,17 +45,25 @@ jobs:
           echo "result=$output" >> "$GITHUB_OUTPUT"
 
       - name: Download latest linkedin_post.txt from Release
+        id: download
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          mkdir -p out
           LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          echo "Downloading linkedin_post.txt from release $LATEST_TAG"
-          gh release download "$LATEST_TAG" --pattern "linkedin_post.txt" --dir ./out --clobber
+          echo "Latest release: $LATEST_TAG"
+          if gh release download "$LATEST_TAG" --pattern "linkedin_post.txt" --dir ./out --clobber 2>/dev/null; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "linkedin_post.txt not in release $LATEST_TAG (release predates LinkedIn feature) — skipping post"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Verify post file
+        if: steps.download.outputs.found == 'true'
         run: |
           if [ ! -s out/linkedin_post.txt ]; then
-            echo "linkedin_post.txt is empty or missing — aborting"
+            echo "linkedin_post.txt is empty — skipping"
             exit 1
           fi
           CHARS=$(wc -c < out/linkedin_post.txt)
@@ -64,6 +72,7 @@ jobs:
           head -c 200 out/linkedin_post.txt
 
       - name: Post to LinkedIn
+        if: steps.download.outputs.found == 'true'
         env:
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
