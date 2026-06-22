@@ -1,0 +1,146 @@
+name: Post to LinkedIn
+
+on:
+  workflow_dispatch:
+  # Monday 08:00 UTC — LinkedIn's peak engagement window.
+  # The Sunday 22:00 UTC pipeline run generates linkedin_post.txt; this
+  # workflow picks it up from the latest GitHub Release and posts it.
+  schedule:
+    - cron: "0 8 * * MON"
+
+concurrency:
+  group: linkedin-post
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Install Python deps
+        run: uv sync
+
+      - name: Check token expiry
+        id: expiry
+        env:
+          LINKEDIN_TOKEN_EXPIRES_AT: ${{ secrets.LINKEDIN_TOKEN_EXPIRES_AT }}
+        run: |
+          # Exits 1 (and prints TOKEN_EXPIRING_SOON:N) if within 10 days of expiry.
+          # We capture this but don't fail the job here — we post first, warn after.
+          output=$(uv run python -m pipeline.publishers.linkedin check-expiry 2>/dev/null || true)
+          echo "result=$output" >> "$GITHUB_OUTPUT"
+
+      - name: Download latest linkedin_post.txt from Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+          echo "Downloading linkedin_post.txt from release $LATEST_TAG"
+          gh release download "$LATEST_TAG" --pattern "linkedin_post.txt" --dir ./out --clobber
+
+      - name: Verify post file
+        run: |
+          if [ ! -s out/linkedin_post.txt ]; then
+            echo "linkedin_post.txt is empty or missing — aborting"
+            exit 1
+          fi
+          CHARS=$(wc -c < out/linkedin_post.txt)
+          echo "Post file: $CHARS characters"
+          echo "--- Post preview (first 200 chars) ---"
+          head -c 200 out/linkedin_post.txt
+
+      - name: Post to LinkedIn
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+        run: |
+          uv run python -m pipeline.publishers.linkedin post out/linkedin_post.txt
+
+      - name: Warn if token expiring soon
+        if: startsWith(steps.expiry.outputs.result, 'TOKEN_EXPIRING_SOON')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = '${{ steps.expiry.outputs.result }}';
+            const days = result.split(':')[1];
+            const expiry = process.env.LINKEDIN_TOKEN_EXPIRES_AT || 'unknown date';
+            // Only open a new issue if one isn't already open for this.
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'linkedin-token-expiry',
+              state: 'open',
+            });
+            if (issues.data.length > 0) { return; }  // already warned
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `LinkedIn access token expires in ${days} days — renewal needed`,
+              body: [
+                `The LinkedIn OAuth access token will expire in **${days} days** (around ${expiry}).`,
+                '',
+                '## How to renew (takes ~2 minutes)',
+                '',
+                '**Step 1** — Get a new authorization code:',
+                '```',
+                'open "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=https%3A%2F%2Fwww.linkedin.com%2Fdevelopers%2Ftools%2Foauth%2Fredirect&scope=w_member_social%20openid%20profile"',
+                '```',
+                '',
+                '**Step 2** — Exchange the code for a new token (act fast — codes expire in ~30s):',
+                '```bash',
+                'curl -X POST "https://www.linkedin.com/oauth/v2/accessToken" \\',
+                '  -H "Content-Type: application/x-www-form-urlencoded" \\',
+                '  --data-urlencode "grant_type=authorization_code" \\',
+                '  --data-urlencode "code=CODE_FROM_REDIRECT" \\',
+                '  --data-urlencode "redirect_uri=https://www.linkedin.com/developers/tools/oauth/redirect" \\',
+                '  --data-urlencode "client_id=YOUR_CLIENT_ID" \\',
+                '  --data-urlencode "client_secret=YOUR_CLIENT_SECRET"',
+                '```',
+                '',
+                '**Step 3** — Update the GitHub Secret:',
+                'Repo → Settings → Secrets → Actions → `LINKEDIN_ACCESS_TOKEN` → update value.',
+                '',
+                'Also update `LINKEDIN_TOKEN_EXPIRES_AT` to today + 60 days (ISO format: `YYYY-MM-DD`).',
+                '',
+                'Close this issue once done.',
+              ].join('\n'),
+              labels: ['linkedin-token-expiry'],
+            });
+        env:
+          LINKEDIN_TOKEN_EXPIRES_AT: ${{ secrets.LINKEDIN_TOKEN_EXPIRES_AT }}
+
+      - name: Open issue on post failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `LinkedIn post failed — ${new Date().toISOString().slice(0, 10)}`,
+              body: [
+                'The Monday LinkedIn post workflow failed.',
+                '',
+                `Run: ${runUrl}`,
+                '',
+                '**Most likely cause:** the access token expired (60-day lifetime).',
+                'Follow the renewal steps in any open `linkedin-token-expiry` issue,',
+                'or re-authorize manually and update the `LINKEDIN_ACCESS_TOKEN` secret.',
+              ].join('\n'),
+              labels: ['workflow-failure'],
+            });

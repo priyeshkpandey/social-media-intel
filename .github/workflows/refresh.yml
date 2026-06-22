@@ -51,6 +51,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          DASHBOARD_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
         run: |
           set -o pipefail
           uv run python -m pipeline.main --since 7d --out ./out --cache ./.cache \
@@ -77,6 +78,7 @@ jobs:
             out/clusters.parquet
             out/raw.parquet
             out/run_log.txt
+            out/linkedin_post.txt
 
       - name: Save cluster-state cache
         if: always()

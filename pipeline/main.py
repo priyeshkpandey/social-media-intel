@@ -8,6 +8,7 @@ and from `make refresh` locally:
 Stages run in this order:
   ingest → normalize → dedupe → cheap-filter → embed → semantic-filter
    → cluster → score → synthesize (env-gated) → export
+   → linkedin-post (env-gated)
 
 `ClusterState` is persisted to `./.cache/cluster_state.parquet` between runs
 so cluster IDs stay stable across weeks. The cache directory is restored +
@@ -18,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import re
 import sys
 from collections.abc import Iterator
@@ -35,6 +37,7 @@ from pipeline.stages import filter as filter_stage
 from pipeline.stages import normalize as normalize_stage
 from pipeline.stages import score as score_stage
 from pipeline.stages import synthesize as synthesize_stage
+from pipeline.stages import linkedin_post as linkedin_post_stage
 
 log = logging.getLogger("pipeline")
 
@@ -71,6 +74,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--since", type=parse_since, default=parse_since("7d"))
     parser.add_argument("--out", default=OUT_DIR, help="Output directory.")
     parser.add_argument("--cache", default=CACHE_DIR, help="Cluster-state cache dir.")
+    parser.add_argument(
+        "--dashboard-url",
+        default=os.environ.get("DASHBOARD_URL", ""),
+        help="Public URL of the dashboard (embedded in LinkedIn post).",
+    )
     args = parser.parse_args(argv)
 
     logging.basicConfig(
@@ -150,6 +158,18 @@ def main(argv: list[str] | None = None) -> int:
         paths.raw_parquet,
         paths.run_id,
     )
+
+    # 11. Generate LinkedIn post (heuristic always; LLM when ANTHROPIC_API_KEY set).
+    linkedin_text = linkedin_post_stage.generate(
+        refined, narrative, dashboard_url=args.dashboard_url
+    )
+    if linkedin_text:
+        linkedin_path = out_dir / "linkedin_post.txt"
+        linkedin_path.write_text(linkedin_text, encoding="utf-8")
+        log.info(
+            "linkedin_post: wrote %s (%d chars)", linkedin_path, len(linkedin_text)
+        )
+
     return 0
 
 
