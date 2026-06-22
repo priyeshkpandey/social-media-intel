@@ -204,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)-7s %(name)s :: %(message)s",
-        stream=sys.stdout,
+        stream=sys.stderr,
     )
 
     parser = argparse.ArgumentParser(prog="linkedin", description="LinkedIn publisher.")
