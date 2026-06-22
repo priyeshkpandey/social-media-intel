@@ -44,7 +44,7 @@ jobs:
           output=$(uv run python -m pipeline.publishers.linkedin check-expiry 2>/dev/null || true)
           echo "result=$output" >> "$GITHUB_OUTPUT"
 
-      - name: Download latest linkedin_post.txt from Release
+      - name: Download LinkedIn assets from latest Release
         id: download
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +57,10 @@ jobs:
           else
             echo "linkedin_post.txt not in release $LATEST_TAG (release predates LinkedIn feature) — skipping post"
             echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          # Image is optional — don't fail if absent (heuristic-only runs skip it)
+          gh release download "$LATEST_TAG" --pattern "linkedin_image.png" --dir ./out --clobber 2>/dev/null || true
 
       - name: Verify post file
         if: steps.download.outputs.found == 'true'
@@ -77,7 +80,14 @@ jobs:
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
         run: |
-          uv run python -m pipeline.publishers.linkedin post out/linkedin_post.txt
+          IMAGE_ARG=""
+          if [ -f out/linkedin_image.png ]; then
+            echo "Image found ($(du -k out/linkedin_image.png | cut -f1) KB) — posting with infographic"
+            IMAGE_ARG="--image out/linkedin_image.png"
+          else
+            echo "No image asset — posting text only"
+          fi
+          uv run python -m pipeline.publishers.linkedin post out/linkedin_post.txt $IMAGE_ARG
 
       - name: Warn if token expiring soon
         if: startsWith(steps.expiry.outputs.result, 'TOKEN_EXPIRING_SOON')

@@ -31,9 +31,10 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-_UGC_POSTS_URL = "https://api.linkedin.com/v2/ugcPosts"
-_USERINFO_URL = "https://api.linkedin.com/v2/userinfo"
-_EXPIRY_WARN_DAYS = 10
+_UGC_POSTS_URL      = "https://api.linkedin.com/v2/ugcPosts"
+_USERINFO_URL       = "https://api.linkedin.com/v2/userinfo"
+_ASSETS_URL         = "https://api.linkedin.com/v2/assets?action=registerUpload"
+_EXPIRY_WARN_DAYS   = 10
 
 
 # ---------------------------------------------------------------------------
@@ -80,23 +81,108 @@ def get_person_urn(access_token: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def post_text(text: str, access_token: str, person_urn: str) -> str:
-    """Create a public LinkedIn text post. Returns the post URN."""
-    payload = json.dumps(
-        {
-            "author": person_urn,
-            "lifecycleState": "PUBLISHED",
-            "specificContent": {
-                "com.linkedin.ugc.ShareContent": {
-                    "shareCommentary": {"text": text},
-                    "shareMediaCategory": "NONE",
-                }
-            },
-            "visibility": {
-                "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-            },
+def upload_image(image_path: Path, access_token: str, person_urn: str) -> str:
+    """Upload a PNG/JPG to LinkedIn. Returns the digitalmediaAsset URN.
+
+    Three-step LinkedIn image upload flow:
+      1. Register upload  → get upload URL + asset URN
+      2. PUT binary bytes → LinkedIn stores the image
+      3. Return asset URN → caller embeds it in the UGC post
+    """
+    # Step 1 — register
+    register_body = json.dumps({
+        "registerUploadRequest": {
+            "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
+            "owner": person_urn,
+            "serviceRelationships": [{
+                "relationshipType": "OWNER",
+                "identifier": "urn:li:userGeneratedContent",
+            }],
         }
-    ).encode()
+    }).encode()
+
+    req = urllib.request.Request(
+        _ASSETS_URL,
+        data=register_body,
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+            "X-Restli-Protocol-Version": "2.0.0",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            reg = json.loads(resp.read())
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(
+            f"LinkedIn registerUpload failed ({exc.code}): {exc.read().decode(errors='replace')}"
+        ) from exc
+
+    value       = reg["value"]
+    asset_urn   = value["asset"]
+    upload_mech = value["uploadMechanism"]
+    upload_info = upload_mech["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"]
+    upload_url  = upload_info["uploadUrl"]
+    upload_hdrs = upload_info.get("headers", {})
+
+    # Step 2 — binary upload
+    image_bytes = image_path.read_bytes()
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "image/png",
+        **upload_hdrs,
+    }
+    upload_req = urllib.request.Request(
+        upload_url, data=image_bytes, headers=headers, method="PUT"
+    )
+    try:
+        with urllib.request.urlopen(upload_req, timeout=60) as _:
+            pass
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(
+            f"LinkedIn image upload failed ({exc.code}): {exc.read().decode(errors='replace')}"
+        ) from exc
+
+    log.info("linkedin: image uploaded — asset=%s (%d KB)", asset_urn, len(image_bytes) // 1024)
+    return asset_urn
+
+
+def post_text(
+    text: str,
+    access_token: str,
+    person_urn: str,
+    *,
+    image_asset_urn: str | None = None,
+) -> str:
+    """Create a public LinkedIn post. Attaches an image when image_asset_urn is given."""
+    if image_asset_urn:
+        share_content: dict = {
+            "shareCommentary": {"text": text},
+            "shareMediaCategory": "IMAGE",
+            "media": [{
+                "status": "READY",
+                "description": {"text": "DevSignal weekly intelligence briefing"},
+                "media": image_asset_urn,
+                "title": {"text": "DevSignal Intelligence Briefing"},
+            }],
+        }
+    else:
+        share_content = {
+            "shareCommentary": {"text": text},
+            "shareMediaCategory": "NONE",
+        }
+
+    payload = json.dumps({
+        "author": person_urn,
+        "lifecycleState": "PUBLISHED",
+        "specificContent": {
+            "com.linkedin.ugc.ShareContent": share_content,
+        },
+        "visibility": {
+            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+        },
+    }).encode()
 
     req = urllib.request.Request(
         _UGC_POSTS_URL,
@@ -112,12 +198,12 @@ def post_text(text: str, access_token: str, person_urn: str) -> str:
         with urllib.request.urlopen(req, timeout=30) as resp:
             post_id = resp.headers.get("x-restli-id", "")
     except urllib.error.HTTPError as exc:
-        body_text = exc.read().decode(errors="replace")
         raise RuntimeError(
-            f"LinkedIn post failed ({exc.code}): {body_text}"
+            f"LinkedIn post failed ({exc.code}): {exc.read().decode(errors='replace')}"
         ) from exc
 
-    log.info("linkedin: posted successfully — id=%s", post_id)
+    log.info("linkedin: posted successfully%s — id=%s",
+             " (with image)" if image_asset_urn else "", post_id)
     return post_id
 
 
@@ -157,8 +243,8 @@ def check_expiry() -> bool:
 # ---------------------------------------------------------------------------
 
 
-def cmd_post(post_file: str) -> None:
-    """Post text from file to LinkedIn."""
+def cmd_post(post_file: str, image_file: str | None = None) -> None:
+    """Post text (+ optional image) from files to LinkedIn."""
     text = Path(post_file).read_text(encoding="utf-8").strip()
     if not text:
         raise RuntimeError(f"Post file is empty: {post_file!r}")
@@ -167,8 +253,17 @@ def cmd_post(post_file: str) -> None:
         text = text[:3000].rsplit("\n", 1)[0].strip()
 
     access_token = _require_env("LINKEDIN_ACCESS_TOKEN")
-    person_urn = get_person_urn(access_token)
-    post_id = post_text(text, access_token, person_urn)
+    person_urn   = get_person_urn(access_token)
+
+    image_asset_urn: str | None = None
+    if image_file:
+        img_path = Path(image_file)
+        if img_path.is_file():
+            image_asset_urn = upload_image(img_path, access_token, person_urn)
+        else:
+            log.warning("linkedin: image file not found: %s — posting text only", image_file)
+
+    post_id = post_text(text, access_token, person_urn, image_asset_urn=image_asset_urn)
     print(f"Posted: {post_id}")
 
 
@@ -210,15 +305,16 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="linkedin", description="LinkedIn publisher.")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    p = sub.add_parser("post", help="Post text from a file to LinkedIn.")
+    p = sub.add_parser("post", help="Post text (+ optional image) to LinkedIn.")
     p.add_argument("file", help="Path to the plain-text post file.")
+    p.add_argument("--image", default=None, help="Path to PNG infographic (optional).")
 
     sub.add_parser("check-expiry", help="Warn if token expires within 10 days.")
 
     args = parser.parse_args(argv)
     try:
         if args.cmd == "post":
-            cmd_post(args.file)
+            cmd_post(args.file, image_file=args.image)
         elif args.cmd == "check-expiry":
             cmd_check_expiry()
     except RuntimeError as exc:

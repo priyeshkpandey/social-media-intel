@@ -38,6 +38,7 @@ from pipeline.stages import normalize as normalize_stage
 from pipeline.stages import score as score_stage
 from pipeline.stages import synthesize as synthesize_stage
 from pipeline.stages import linkedin_post as linkedin_post_stage
+from pipeline.stages import linkedin_image as linkedin_image_stage
 
 log = logging.getLogger("pipeline")
 
@@ -159,7 +160,7 @@ def main(argv: list[str] | None = None) -> int:
         paths.run_id,
     )
 
-    # 11. Generate LinkedIn post (heuristic always; LLM when ANTHROPIC_API_KEY set).
+    # 11. Generate LinkedIn post text + infographic image.
     linkedin_text = linkedin_post_stage.generate(
         refined, narrative, dashboard_url=args.dashboard_url
     )
@@ -169,6 +170,13 @@ def main(argv: list[str] | None = None) -> int:
         log.info(
             "linkedin_post: wrote %s (%d chars)", linkedin_path, len(linkedin_text)
         )
+
+    linkedin_image_stage.generate_image(
+        refined, narrative,
+        out_path=out_dir / "linkedin_image.png",
+        run_id=paths.run_id,
+        dashboard_url=args.dashboard_url,
+    )
 
     return 0
 

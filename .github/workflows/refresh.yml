@@ -79,6 +79,7 @@ jobs:
             out/raw.parquet
             out/run_log.txt
             out/linkedin_post.txt
+            out/linkedin_image.png
 
       - name: Save cluster-state cache
         if: always()
