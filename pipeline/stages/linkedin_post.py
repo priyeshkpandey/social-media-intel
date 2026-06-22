@@ -68,6 +68,11 @@ def _llm_post(
     dashboard_url: str,
 ) -> str | None:
     system = _PROMPT_PATH.read_text(encoding="utf-8")
+    # Inject the URL directly into the system prompt so the model cannot miss it.
+    # Passing it only as JSON data is unreliable — the model treats {dashboard_url}
+    # in the prompt as a literal placeholder rather than reading from the payload.
+    if dashboard_url:
+        system += f"\n\nDashboard URL for this week's post: {dashboard_url}\nYou MUST include this URL in the link line (step 11 of the structure)."
     payload = _build_payload(scored, narrative, dashboard_url)
 
     try:
