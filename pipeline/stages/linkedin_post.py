@@ -92,6 +92,7 @@ def _llm_post(
         return _heuristic_post(scored, narrative, dashboard_url)
 
     text = text.strip()
+    text = _inject_url(text, dashboard_url)
     if len(text) > _MAX_POST_CHARS:
         log.warning(
             "linkedin_post: LLM output %d chars > limit %d — truncating at last newline",
@@ -221,6 +222,32 @@ def _heuristic_post(
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def _inject_url(text: str, dashboard_url: str) -> str:
+    """Guarantee the dashboard URL appears in the post text.
+
+    If the URL is already present (LLM included it), return unchanged.
+    Otherwise insert it before the hashtag line so it's always visible.
+    """
+    if not dashboard_url or dashboard_url in text:
+        return text
+
+    link_line = f"Full breakdown → {dashboard_url}"
+    lines = text.split("\n")
+
+    # Find the last hashtag line and insert the URL + blank line before it.
+    for i in range(len(lines) - 1, -1, -1):
+        if lines[i].strip().startswith("#"):
+            lines.insert(i, "")
+            lines.insert(i, link_line)
+            log.info("linkedin_post: injected dashboard URL before hashtags")
+            return "\n".join(lines)
+
+    # No hashtag line found — append at the end.
+    lines += ["", link_line]
+    log.info("linkedin_post: appended dashboard URL to post")
+    return "\n".join(lines)
 
 
 def _first_text(resp: Any) -> str | None:
