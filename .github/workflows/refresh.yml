@@ -46,12 +46,17 @@ jobs:
           restore-keys: |
             cluster-state-
 
+      - name: Set dashboard URL
+        run: |
+          # github.event.repository.name is empty for schedule events; derive from GITHUB_REPOSITORY.
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          echo "DASHBOARD_URL=https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}/" >> "$GITHUB_ENV"
+
       - name: Run pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
-          DASHBOARD_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
         run: |
           set -o pipefail
           uv run python -m pipeline.main --since 7d --out ./out --cache ./.cache \
