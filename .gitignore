@@ -38,6 +38,8 @@ out/
 
 # Agent Brain
 .agent-brain/
+bm25_index/
+chroma_db/
 
 # Editors / OS
 .idea/
