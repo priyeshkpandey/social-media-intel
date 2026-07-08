@@ -33,7 +33,7 @@ Your task: Turn this week's software industry pain-point intelligence briefing i
 
 10. **Blank line**
 
-11. **Dashboard link** — Exactly this format: `Full intelligence briefing → URL` where URL is the dashboard URL provided at the end of this system prompt. If no URL was provided, omit this line entirely.
+11. **Dashboard link** — Exactly this format: `Full intelligence briefing → URL` where URL is the dashboard URL provided at the end of this system prompt. If no URL was provided, omit this line entirely. Use URL as "https://priyeshkpandey.github.io/social-media-intel/".
 
 12. **Blank line**
 

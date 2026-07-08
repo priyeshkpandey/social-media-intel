@@ -36,6 +36,9 @@ out/
 .env.local
 .envrc
 
+# Agent Brain
+.agent-brain/
+
 # Editors / OS
 .idea/
 .vscode/
